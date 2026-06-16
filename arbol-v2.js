@@ -253,7 +253,7 @@
           ctx.closePath();
           var al = 0.24 - 0.13 * rg.ecc;
           ctx.lineWidth = 1.1;
-          ctx.strokeStyle = rg.accent ? "rgba(165,128,72," + (al + 0.14) + ")" : "rgba(36,31,23," + al + ")";
+          ctx.strokeStyle = rg.accent ? "rgba(36,31,23," + (al + 0.14) + ")" : "rgba(165,128,72," + al + ")";
           ctx.stroke();
         }
         if (!reduce) requestAnimationFrame(draw);
@@ -279,7 +279,7 @@
           var x = cx + Math.cos(th + rot) * rr, y = cy + Math.sin(th + rot) * rr;
           if (th === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
-        ctx.lineWidth = 1.2; ctx.strokeStyle = "rgba(36,31,23,0.42)"; ctx.stroke();
+        ctx.lineWidth = 1.2; ctx.strokeStyle = "rgba(165,128,72,0.42)"; ctx.stroke();
         ctx.beginPath();
         for (var t2 = 0; t2 <= max; t2 += 0.05) {
           var r2 = maxR * (t2 / max);
@@ -287,8 +287,8 @@
           var bx = cx + Math.cos(a2) * r2, by = cy + Math.sin(a2) * r2;
           if (t2 === 0) ctx.moveTo(bx, by); else ctx.lineTo(bx, by);
         }
-        ctx.lineWidth = 1; ctx.strokeStyle = "rgba(165,128,72,0.35)"; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, 2.6, 0, 6.2832); ctx.fillStyle = "rgba(165,128,72,0.9)"; ctx.fill();
+        ctx.lineWidth = 1; ctx.strokeStyle = "rgba(36,31,23,0.35)"; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, 2.6, 0, 6.2832); ctx.fillStyle = "rgba(36,31,23,0.9)"; ctx.fill();
         if (!reduce) requestAnimationFrame(draw);
       }
       draw(0);
