@@ -264,31 +264,82 @@
 
     function initWheel(c) {
       var ctx = c.getContext("2d"); var W = c.width, H = c.height;
-      var cx = W / 2, cy = H / 2, maxR = Math.min(W, H) * 0.46;
+      var cx = W / 2, cy = H / 2;
+      var bw = W * 0.58, bh = H * 0.28;
+      var topY = H * 0.42, bottomY = H * 0.58;
+      var drops = [];
+      for (var i = 0; i < 18; i++) {
+        drops.push({
+          x: cx + (Math.random() - 0.5) * bw * 0.68,
+          y: topY + (Math.random() - 0.5) * bh * 0.55,
+          r: 2 + Math.random() * 4,
+          delay: Math.random() * 2600
+        });
+      }
+      function ellipsePath(y, w, h) {
+        ctx.beginPath();
+        ctx.ellipse(cx, y, w / 2, h / 2, 0, 0, 6.2832);
+      }
       function draw(time) {
         ctx.clearRect(0, 0, W, H);
-        var rot = reduce ? 0 : time * 0.0009;
-        for (var g = 1; g <= 6; g++) {
-          ctx.beginPath(); ctx.arc(cx, cy, maxR * g / 6, 0, 6.2832);
-          ctx.lineWidth = 1; ctx.strokeStyle = "rgba(36,31,23,0.07)"; ctx.stroke();
+        var t = reduce ? 0.55 : (time * 0.00018) % 1;
+        var fill = 0.12 + 0.7 * (0.5 - 0.5 * Math.cos(t * 6.2832));
+
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        for (var guide = 0; guide < 4; guide++) {
+          ellipsePath(topY + guide * 18, bw - guide * 42, bh - guide * 18);
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = "rgba(36,31,23,0.055)";
+          ctx.stroke();
         }
-        var turns = 7, max = Math.PI * 2 * turns;
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(cx, topY);
+        ctx.scale(1, 0.48);
         ctx.beginPath();
-        for (var th = 0; th <= max; th += 0.05) {
-          var rr = maxR * (th / max);
-          var x = cx + Math.cos(th + rot) * rr, y = cy + Math.sin(th + rot) * rr;
-          if (th === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.lineWidth = 1.2; ctx.strokeStyle = "rgba(165,128,72,0.42)"; ctx.stroke();
+        ctx.arc(0, 0, bw * 0.34, 0, 6.2832);
+        ctx.clip();
+        var grad = ctx.createLinearGradient(-bw * 0.28, 0, bw * 0.28, 0);
+        grad.addColorStop(0, "rgba(165,128,72,0.03)");
+        grad.addColorStop(0.45, "rgba(165,128,72,0.32)");
+        grad.addColorStop(1, "rgba(36,31,23,0.08)");
+        ctx.fillStyle = grad;
+        ctx.fillRect(-bw * 0.36, -bh * 0.6 + (1 - fill) * bh * 0.8, bw * 0.72, bh * 1.2);
+        ctx.restore();
+
+        ellipsePath(topY, bw * 0.72, bh * 0.92);
+        ctx.lineWidth = 1.4; ctx.strokeStyle = "rgba(165,128,72,0.42)"; ctx.stroke();
+        ellipsePath(bottomY, bw * 0.52, bh * 0.52);
+        ctx.lineWidth = 1; ctx.strokeStyle = "rgba(36,31,23,0.22)"; ctx.stroke();
+
         ctx.beginPath();
-        for (var t2 = 0; t2 <= max; t2 += 0.05) {
-          var r2 = maxR * (t2 / max);
-          var a2 = t2 + rot + Math.PI;
-          var bx = cx + Math.cos(a2) * r2, by = cy + Math.sin(a2) * r2;
-          if (t2 === 0) ctx.moveTo(bx, by); else ctx.lineTo(bx, by);
+        ctx.moveTo(cx - bw * 0.36, topY);
+        ctx.bezierCurveTo(cx - bw * 0.28, bottomY + bh * 0.18, cx + bw * 0.28, bottomY + bh * 0.18, cx + bw * 0.36, topY);
+        ctx.lineWidth = 1.1; ctx.strokeStyle = "rgba(36,31,23,0.16)"; ctx.stroke();
+
+        for (var d = 0; d < drops.length; d++) {
+          var drop = drops[d];
+          var pulse = reduce ? 0.6 : ((time + drop.delay) % 2600) / 2600;
+          ctx.beginPath();
+          ctx.arc(drop.x, drop.y + Math.sin(pulse * 6.2832) * 4, drop.r * (0.65 + pulse * 0.55), 0, 6.2832);
+          ctx.fillStyle = "rgba(165,128,72," + (0.16 * (1 - pulse)) + ")";
+          ctx.fill();
         }
-        ctx.lineWidth = 1; ctx.strokeStyle = "rgba(36,31,23,0.35)"; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, 2.6, 0, 6.2832); ctx.fillStyle = "rgba(36,31,23,0.9)"; ctx.fill();
+
+        var brush = reduce ? 0.5 : (0.5 - 0.5 * Math.cos((time * 0.00042 % 1) * 6.2832));
+        var bx = cx - bw * 0.32 + brush * bw * 0.64;
+        var by = topY - bh * 0.18 + Math.sin(brush * 6.2832) * 12;
+        ctx.beginPath();
+        ctx.moveTo(bx - 70, by - 30);
+        ctx.lineTo(bx + 6, by + 4);
+        ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.strokeStyle = "rgba(36,31,23,0.34)"; ctx.stroke();
+        ctx.beginPath();
+        ctx.ellipse(bx + 18, by + 8, 28, 8, 0.28, 0, 6.2832);
+        ctx.fillStyle = "rgba(36,31,23,0.26)";
+        ctx.fill();
+
         if (!reduce) requestAnimationFrame(draw);
       }
       draw(0);
