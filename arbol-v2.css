@@ -353,22 +353,6 @@ img { display:block; max-width:100%; }
 .reserve-stats .st { background: var(--night-2); padding: 1.1rem 1.2rem; }
 .reserve-stats .st b { font-family: var(--serif); font-weight: 400; font-size: 1.7rem; display:block; }
 .reserve-stats .st span { font-size: 0.7rem; letter-spacing:0.14em; text-transform:uppercase; color: var(--on-night-faint); }
-.reserve-photos {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.65rem;
-  margin-top: 2rem;
-}
-.reserve-photos image-slot {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  aspect-ratio: 4 / 3;
-  border: 1px solid var(--line-d);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
 .panel { background: var(--night); border:1px solid var(--line-d); border-radius: 6px; padding: clamp(1.5rem,3vw,2.6rem); }
 .steps-ind { display:flex; align-items:center; gap: 0.75rem; margin-bottom: 2rem; }
 .steps-ind .dot { display:flex; align-items:center; gap:0.6rem; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color: var(--on-night-faint); }
@@ -447,7 +431,7 @@ img { display:block; max-width:100%; }
 @media (max-width: 800px){ .care{ grid-template-columns:1fr; gap:2rem; } }
 @media (max-width: 520px){ .care-cols{ grid-template-columns:1fr; } }
 
-/* ---------- Animations canvas (tour / ondes) ---------- */
+/* ---------- Animations canvas (bois) ---------- */
 .lathe-wrap { margin: clamp(2.5rem,6vw,5rem) auto 0; max-width: 760px; display:flex; flex-direction:column; align-items:center; gap: 1.1rem; }
 .lathe { width: 100%; height: auto; aspect-ratio: 1100 / 640; display:block; }
 .lathe-cap { font-family: var(--serif); font-style: italic; font-size: 0.92rem; color: #9a8f7e; text-align:center; }
@@ -681,8 +665,6 @@ html.js .reveal.in { opacity: 1; transform: none; }
   .reserve-stats { margin-top: 2rem; }
   .reserve-stats .st { padding: 1rem; }
   .reserve-stats .st b { font-size: 1.45rem; }
-  .reserve-photos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .reserve-photos image-slot { aspect-ratio: 1; }
   .panel { padding: 1.15rem; }
   .steps-ind {
     align-items: flex-start;
@@ -728,7 +710,6 @@ html.js .reveal.in { opacity: 1; transform: none; }
   .matter-media .ms,
   .hand-media { aspect-ratio: 1 / 1; }
   .reserve-stats { grid-template-columns: 1fr; }
-  .reserve-photos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .steps-ind .dot span { display: none; }
   .steps-ind .sep { margin-top: 13px; }
   .btn {

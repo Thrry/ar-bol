@@ -63,7 +63,7 @@ site-claude-design/
 4. **Ar-bol à vivre** — triptyque cadré : Fruits · Nature morte & végétale · Parfum & choses précieuses
 5. **Variations** (Chapitre III) — 4 modèles : Unan, Daou, Tri, Pevar (lignes alternées, grands chiffres)
 6. **La matière · Le bois** (Chapitre IV) — texte + artisan tourneur + canvas « anneaux du bois » animé en fond
-7. **La matière · La faïence** — texte + atelier + canvas « tour de potier » animé
+7. **La matière · La faïence** — texte + atelier
 8. **Finistère** — fond filigrane carte (crayon, multiply)
 9. **Le designer** — portrait + bio, puis « Les mains d'Ar-bol » (tourneur + potière)
 10. **Série limitée** (Chapitre V) — jauge des 50 (12 réservées s'allument)
@@ -84,8 +84,8 @@ site-claude-design/
 - **Images** : composant `<image-slot id="…" src="assets/…" placeholder="…">`.
   Le `placeholder` sert de légende/brief si l'image manque. Formats portrait
   privilégiés (2:3 ou 4:5).
-- **Animations de fond** : `<canvas>` pilotés en JS (anneaux du bois = `#lathe`,
-  tour de potier = `#wheel`). Respectent `prefers-reduced-motion`.
+- **Animations de fond** : `<canvas>` pilotés en JS (anneaux du bois = `#lathe`).
+  Respectent `prefers-reduced-motion`.
 
 ## 6. À finaliser avant publication réelle
 
