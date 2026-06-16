@@ -503,6 +503,25 @@ img { display:block; max-width:100%; }
 .tally i.on { background: var(--accent); }
 .tally-legend { display:flex; justify-content:center; gap: 3rem; margin-top: 1.5rem; font-size:0.74rem; letter-spacing:0.14em; text-transform:uppercase; color: var(--on-night-faint); }
 .tally-legend b { font-family: var(--serif); font-size: 1.4rem; color: var(--on-night); font-weight:400; margin-right:0.35rem; }
+.edition-note {
+  max-width: 760px;
+  margin: clamp(2.5rem, 5vw, 4rem) auto 0;
+  padding-top: clamp(1.8rem, 3vw, 2.5rem);
+  border-top: 1px solid var(--line-d);
+  text-align: left;
+}
+.edition-note h3 {
+  margin: 0 0 1rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--on-night);
+}
+.edition-note p {
+  margin: 0;
+  color: var(--on-night-soft);
+  text-wrap: pretty;
+}
 @media (max-width: 560px){ .tally{ height: 46px; gap:3px; } }
 
 /* ---------- BANDEAU CONFIANCE (livraison / paiement) ---------- */
