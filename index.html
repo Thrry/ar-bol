@@ -307,13 +307,20 @@
       <aside class="reveal">
         <p class="eyebrow"><span lang="fr">Réservation</span><span lang="en">Reservation</span></p>
         <h2 class="display"><span lang="fr">Réserver un exemplaire.</span><span lang="en">Reserve a piece.</span></h2>
-        <div class="price">420 €</div>
-        <p class="price-note"><span lang="fr">Acompte 168 € · solde 252 € avant livraison</span><span lang="en">168 € deposit · 252 € balance before delivery</span></p>
+        <div class="price">420 € TTC</div>
+        <p class="price-note"><span lang="fr">Prix de lancement · acompte de 60 % à la commande</span><span lang="en">Launch price · 60% deposit on order</span></p>
         <div class="reserve-stats">
           <div class="st"><b>50</b><span lang="fr">Exemplaires</span><span lang="en">Pieces</span></div>
-          <div class="st"><b>4–6</b><span lang="fr">Semaines</span><span lang="en">Weeks</span></div>
-          <div class="st"><b>40 %</b><span lang="fr">Acompte</span><span lang="en">Deposit</span></div>
-          <div class="st"><b>FR</b><span lang="fr">Livraison France</span><span lang="en">France delivery</span></div>
+          <div class="st"><b>6–8</b><span lang="fr">Semaines</span><span lang="en">Weeks</span></div>
+          <div class="st"><b>60 %</b><span lang="fr">Acompte</span><span lang="en">Deposit</span></div>
+          <div class="st"><b>252 €</b><span lang="fr">À la commande</span><span lang="en">On order</span></div>
+        </div>
+        <p class="launch-note"><span lang="fr">Ce tarif correspond au prix de lancement de cette première édition limitée. Il permet de rendre la collection accessible pour son lancement tout en reflétant le caractère artisanal de sa fabrication.</span><span lang="en">This launch price makes the first limited edition more accessible while reflecting the artisanal nature of its production.</span></p>
+        <div class="reserve-photos" aria-hidden="true">
+          <image-slot src="assets/arbol-atelier.png" shape="rect" fit="cover" placeholder="PHOTO — application de l'email au pinceau"></image-slot>
+          <image-slot src="assets/maker-bois.png" shape="rect" fit="cover" placeholder="PHOTO — travail du bois"></image-slot>
+          <image-slot src="assets/portrait-tourneur.png" shape="rect" fit="cover" placeholder="PHOTO — assemblage"></image-slot>
+          <image-slot src="assets/portrait-potier.png" shape="rect" fit="cover" placeholder="PHOTO — finitions"></image-slot>
         </div>
       </aside>
 
@@ -347,10 +354,10 @@
           <div class="recap">
             <div class="recap-row"><span><span lang="fr">Variation</span><span lang="en">Variation</span></span><span id="recapVar">—</span></div>
             <div class="recap-row"><span><span lang="fr">Prix final</span><span lang="en">Final price</span></span><span>420 €</span></div>
-            <div class="recap-row"><span><span lang="fr">Solde à la livraison</span><span lang="en">Balance on delivery</span></span><span>252 €</span></div>
-            <div class="recap-row tot"><span><span lang="fr">Acompte à régler</span><span lang="en">Deposit due now</span></span><span>168 €</span></div>
+            <div class="recap-row"><span><span lang="fr">Solde avant livraison</span><span lang="en">Balance before delivery</span></span><span>168 €</span></div>
+            <div class="recap-row tot"><span><span lang="fr">Acompte à régler</span><span lang="en">Deposit due now</span></span><span>252 €</span></div>
           </div>
-          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="1"><span lang="fr">Retour</span><span lang="en">Back</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" id="pay" disabled><span lang="fr">Régler l'acompte — 168 €</span><span lang="en">Pay deposit — 168 €</span></button></div>
+          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="1"><span lang="fr">Retour</span><span lang="en">Back</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" id="pay" disabled><span lang="fr">Régler l'acompte — 252 €</span><span lang="en">Pay deposit — 252 €</span></button></div>
           <p class="secure-note"><span lang="fr">Paiement sécurisé par Stripe — emplacement de démonstration.</span><span lang="en">Secure payment by Stripe — demo placeholder.</span></p>
         </div>
 
@@ -358,7 +365,7 @@
           <div class="confirm-mark">✓</div>
           <h3><span lang="fr">Réservation confirmée</span><span lang="en">Reservation confirmed</span></h3>
           <p class="confirm-detail"><span lang="fr">Merci <b id="confName">—</b>. Votre exemplaire <b id="confVar">—</b> est réservé. Un email de confirmation vous a été envoyé.</span><span lang="en">Thank you <b id="confNameEn">—</b>. Your <b id="confVarEn">—</b> piece is reserved. A confirmation email is on its way.</span></p>
-          <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Acompte de <b>168 €</b> reçu · solde de <b>252 €</b> avant la livraison sous 4 à 6 semaines.</span><span lang="en">Deposit of <b>168 €</b> received · <b>252 €</b> balance before delivery within 4 to 6 weeks.</span></p>
+          <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Acompte de <b>252 €</b> reçu · solde de <b>168 €</b> avant la livraison sous 6 à 8 semaines.</span><span lang="en">Deposit of <b>252 €</b> received · <b>168 €</b> balance before delivery within 6 to 8 weeks.</span></p>
           <div class="step-actions"><div class="spacer"></div><button type="button" class="btn btn-ghost" id="restart"><span lang="fr">Nouvelle réservation</span><span lang="en">New reservation</span></button></div>
         </div>
       </div>
@@ -369,7 +376,7 @@
         <div class="t">
           <span class="n">01</span>
           <h4><span lang="fr">Acompte & solde</span><span lang="en">Deposit & balance</span></h4>
-          <p><span lang="fr">40 % à la réservation (168 €), le solde de 252 € réglé avant l'expédition.</span><span lang="en">40% on reservation (168 €), the 252 € balance settled before shipping.</span></p>
+          <p><span lang="fr">60 % à la commande (252 €), le solde de 168 € réglé avant l'expédition.</span><span lang="en">60% on order (252 €), the 168 € balance settled before shipping.</span></p>
         </div>
         <div class="t">
           <span class="n">02</span>
@@ -379,7 +386,7 @@
         <div class="t">
           <span class="n">03</span>
           <h4><span lang="fr">Livraison</span><span lang="en">Delivery</span></h4>
-          <p><span lang="fr">Expédition en France sous 4 à 6 semaines, emballage protecteur dédié.</span><span lang="en">Shipped in France within 4 to 6 weeks, in dedicated protective packaging.</span></p>
+          <p><span lang="fr">Délai de fabrication et de livraison estimé entre 6 et 8 semaines.</span><span lang="en">Estimated production and delivery time between 6 and 8 weeks.</span></p>
         </div>
         <div class="t">
           <span class="n">04</span>

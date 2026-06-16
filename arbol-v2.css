@@ -340,10 +340,24 @@ img { display:block; max-width:100%; }
 .reserve h2 { font-size: clamp(2.2rem,5vw,3.6rem); margin-top: 1rem; }
 .price { font-family: var(--serif); font-weight: 300; font-size: clamp(3.6rem,8vw,6rem); line-height:1; margin-top: 1.4rem; }
 .price-note { color: var(--on-night-soft); margin-top: 0.6rem; }
+.launch-note { color: var(--on-night-soft); margin-top: 1.6rem; max-width: 42ch; }
 .reserve-stats { display:grid; grid-template-columns: repeat(2,1fr); gap:1px; margin-top: 2.6rem; background: var(--line-d); border:1px solid var(--line-d); }
 .reserve-stats .st { background: var(--night-2); padding: 1.1rem 1.2rem; }
 .reserve-stats .st b { font-family: var(--serif); font-weight: 400; font-size: 1.7rem; display:block; }
 .reserve-stats .st span { font-size: 0.7rem; letter-spacing:0.14em; text-transform:uppercase; color: var(--on-night-faint); }
+.reserve-photos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+  margin-top: 2rem;
+}
+.reserve-photos image-slot {
+  display: block;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line-d);
+  border-radius: 4px;
+  overflow: hidden;
+}
 
 .panel { background: var(--night); border:1px solid var(--line-d); border-radius: 6px; padding: clamp(1.5rem,3vw,2.6rem); }
 .steps-ind { display:flex; align-items:center; gap: 0.75rem; margin-bottom: 2rem; }
