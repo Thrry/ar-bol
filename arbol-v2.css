@@ -339,6 +339,14 @@ img { display:block; max-width:100%; }
 .reserve-grid { display:grid; grid-template-columns: 0.95fr 1.05fr; gap: clamp(2.5rem,6vw,6rem); align-items:start; }
 .reserve h2 { font-size: clamp(2.2rem,5vw,3.6rem); margin-top: 1rem; }
 .price { font-family: var(--serif); font-weight: 300; font-size: clamp(3.6rem,8vw,6rem); line-height:1; margin-top: 1.4rem; }
+.price-tax {
+  font-family: var(--sans);
+  font-size: 0.18em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  vertical-align: super;
+  color: var(--on-night-soft);
+}
 .price-note { color: var(--on-night-soft); margin-top: 0.6rem; }
 .launch-note { color: var(--on-night-soft); margin-top: 1.6rem; max-width: 42ch; }
 .reserve-stats { display:grid; grid-template-columns: repeat(2,1fr); gap:1px; margin-top: 2.6rem; background: var(--line-d); border:1px solid var(--line-d); }
