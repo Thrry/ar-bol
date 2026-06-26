@@ -108,7 +108,7 @@
         }
       }
 
-      // badge : visible après le hero, masqué quand la réservation est à l'écran
+      // badge : visible après le hero, masqué quand la commande est à l'écran
       if (badge) {
         var rs = reserveSec.getBoundingClientRect();
         var show = st > vh * 0.85 && rs.top > vh * 0.55;
@@ -122,7 +122,7 @@
   window.addEventListener("load", function () { onScroll(); drawRules(); });
   onScroll(); drawRules();
 
-  /* ---------- Réservation ---------- */
+  /* ---------- Commande / paiement ---------- */
   var state = { variant: null };
   var steps = document.querySelectorAll(".panel .step");
   var dots = document.querySelectorAll("#stepsInd .dot");
@@ -184,7 +184,7 @@
     gotoStep(1);
   });
 
-  /* ---------- Édition : jauge de rareté (50 traits, 12 réservés) ---------- */
+  /* ---------- Édition : jauge de rareté (50 traits, 12 commandés) ---------- */
   var tally = document.getElementById("tally");
   if (tally) {
     for (var ti = 0; ti < 50; ti++) tally.appendChild(document.createElement("i"));
@@ -206,60 +206,6 @@
     window.addEventListener("load", fillTally);
     fillTally(); setTimeout(fillTally, 300); setTimeout(fillTally, 900);
   }
-
-  /* ---------- Animations canvas : anneaux du bois ---------- */
-  (function () {
-    var lathe = document.getElementById("lathe");
-    if (lathe) initRings(lathe);
-
-    function initRings(c) {
-      var ctx = c.getContext("2d"); var W = c.width, H = c.height;
-      var cx = W * 0.5, cy = H * 0.54;
-      var maxR = Math.min(W, H) * 0.64;
-      var N = 32, rings = [];
-      for (var i = 0; i < N; i++) {
-        var t = i / (N - 1);
-        rings.push({
-          r: maxR * (0.05 + 0.95 * Math.pow(t, 1.06)),
-          k: 2 + Math.floor(Math.random() * 4),
-          amp: 0.022 + Math.random() * 0.05,
-          phase: Math.random() * Math.PI * 2,
-          speed: (0.10 + Math.random() * 0.16) * ((i % 2) ? -1 : 1),
-          cphase: Math.random() * Math.PI * 2,
-          cspeed: 0.00025 + Math.random() * 0.0005,
-          accent: Math.random() < 0.10,
-          ecc: t
-        });
-      }
-      var orbR = maxR * 0.08;
-      function draw(time) {
-        ctx.clearRect(0, 0, W, H);
-        for (var i = 0; i < rings.length; i++) {
-          var rg = rings[i];
-          var rot = rg.phase + (reduce ? 0 : rg.speed * time / 1000);
-          var orbit = reduce ? 0 : rg.cspeed * time;
-          var off = orbR * rg.ecc;
-          var ccx = cx + Math.cos(rg.cphase + orbit) * off;
-          var ccy = cy + Math.sin(rg.cphase + orbit) * off;
-          ctx.beginPath();
-          for (var a = 0; a <= 6.2832 + 0.02; a += Math.PI / 110) {
-            var rr = rg.r * (1 + rg.amp * Math.sin(rg.k * a + rot));
-            var x = ccx + Math.cos(a) * rr;
-            var y = ccy + Math.sin(a) * rr * 0.95;
-            if (a === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-          }
-          ctx.closePath();
-          var al = 0.24 - 0.13 * rg.ecc;
-          ctx.lineWidth = 1.1;
-          ctx.strokeStyle = rg.accent ? "rgba(36,31,23," + (al + 0.14) + ")" : "rgba(165,128,72," + al + ")";
-          ctx.stroke();
-        }
-        if (!reduce) requestAnimationFrame(draw);
-      }
-      draw(0);
-      if (!reduce) requestAnimationFrame(draw);
-    }
-  })();
 
   /* ---------- Liste d'attente ---------- */
   var wlForm = document.getElementById("wlForm");

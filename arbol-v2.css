@@ -292,6 +292,14 @@ img { display:block; max-width:100%; }
 .designer .media { aspect-ratio: 4/5; }
 .designer .lede { max-width: 26ch; }
 .about-title { font-size: clamp(2.4rem,5vw,4rem); margin-top: 1rem; }
+.about-quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  line-height: 1.45;
+  color: var(--on-night);
+}
 .about-actions { margin-top: 1.8rem; }
 .contact-list {
   list-style: none;
@@ -318,25 +326,9 @@ img { display:block; max-width:100%; }
 .sign small { display:block; font-family: var(--sans); font-style: normal; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--on-night-faint); margin-top: 0.4rem; }
 @media (max-width:820px){ .designer{ grid-template-columns:1fr; } .designer .media{ max-width: 24rem; } .contact-list li{ grid-template-columns:1fr; gap:0.25rem; } }
 
-/* ---------- Les mains d'Ar-bol (artisans) ---------- */
-.hands { margin-top: clamp(4rem,9vw,7rem); border-top: 1px solid var(--line-d); padding-top: clamp(3rem,7vw,5rem); }
-.hands-head { text-align:center; max-width: 720px; margin: 0 auto clamp(2.5rem,6vw,4rem); }
-.hands-head h3 { font-size: clamp(1.9rem,4.5vw,3.2rem); margin: 0.8rem 0 0; }
-.hands-intro { color: var(--on-night-soft); margin: 1.1rem auto 0; max-width: 48ch; }
-.hands-grid { display:grid; grid-template-columns: repeat(2,1fr); gap: clamp(1.4rem,3vw,3rem); max-width: 880px; margin: 0 auto; }
-.hand { margin:0; }
-.hand-media { aspect-ratio: 2/3; overflow:hidden; border:1px solid var(--line-d); background:#efe7d8; }
-.hand-media image-slot { width:100%; height:100%; display:block; }
-.hand figcaption { display:flex; flex-direction:column; gap:0.35rem; margin-top:1.1rem; padding-top:0.9rem; border-top:1px solid var(--line-d); }
-.hand-role { font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--on-night-faint); }
-.hand-name { font-family:var(--serif); font-size:1.6rem; line-height:1; }
-.hand-note { font-size:0.9rem; color:var(--on-night-soft); margin-top:0.2rem; }
-.hands-disc { text-align:center; font-style:italic; font-size:0.8rem; color:var(--on-night-faint); margin-top:clamp(2rem,4vw,3rem); }
-@media (max-width: 640px){ .hands-grid{ grid-template-columns:1fr; gap:2.4rem; } }
-
-/* ---------- RÉSERVATION ---------- */
+/* ---------- COMMANDE / PAIEMENT ---------- */
 .reserve { background: var(--night-2); }
-.reserve-grid { display:grid; grid-template-columns: 0.95fr 1.05fr; gap: clamp(2.5rem,6vw,6rem); align-items:start; }
+.reserve-grid { display:grid; grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.28fr); gap: clamp(2rem,5vw,5rem); align-items:end; }
 .reserve h2 { font-size: clamp(2.2rem,5vw,3.6rem); margin-top: 1rem; }
 .price { font-family: var(--serif); font-weight: 300; font-size: clamp(3.6rem,8vw,6rem); line-height:1; margin-top: 1.4rem; }
 .price-tax {
@@ -353,7 +345,7 @@ img { display:block; max-width:100%; }
 .reserve-stats .st { background: var(--night-2); padding: 1.1rem 1.2rem; }
 .reserve-stats .st b { font-family: var(--serif); font-weight: 400; font-size: 1.7rem; display:block; }
 .reserve-stats .st span { font-size: 0.7rem; letter-spacing:0.14em; text-transform:uppercase; color: var(--on-night-faint); }
-.panel { background: var(--night); border:1px solid var(--line-d); border-radius: 6px; padding: clamp(1.5rem,3vw,2.6rem); }
+.panel { background: var(--night); border:1px solid var(--line-d); border-radius: 6px; padding: clamp(1.7rem,3.4vw,3.2rem); }
 .steps-ind { display:flex; align-items:center; gap: 0.75rem; margin-bottom: 2rem; }
 .steps-ind .dot { display:flex; align-items:center; gap:0.6rem; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color: var(--on-night-faint); }
 .steps-ind .dot i { width:26px; height:26px; border-radius:50%; border:1px solid var(--line-d); display:grid; place-items:center; font-style:normal; font-size:0.8rem; }
@@ -368,16 +360,16 @@ img { display:block; max-width:100%; }
 @keyframes stepIn { from { transform: translateY(10px); } to { transform: none; } }
 .step h3 { font-family: var(--serif); font-weight: 400; font-size: 1.7rem; margin: 0 0 1.3rem; }
 
-.var-choices { display:grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
-.var-card { display:flex; align-items:center; gap:0.85rem; text-align:left; cursor:pointer; background:transparent; color: var(--on-night); border:1px solid var(--line-d); border-radius:4px; padding: 0.85rem 0.9rem; font: inherit; }
+.var-choices { display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.var-card { display:flex; align-items:center; gap:1rem; min-height: 116px; text-align:left; cursor:pointer; background:transparent; color: var(--on-night); border:1px solid var(--line-d); border-radius:4px; padding: 1rem; font: inherit; }
 .var-card:hover { border-color: var(--on-night-soft); }
 .var-card.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); }
 .var-card .duo { display:flex; }
-.var-card .thumb { width: 52px; height: 64px; border-radius: 4px; object-fit: cover; flex: none; display:block; background: #15120f; }
+.var-card .thumb { width: 76px; height: 92px; border-radius: 4px; object-fit: cover; flex: none; display:block; background: #15120f; }
 .var-card .thumb-duo { border:1px solid rgba(255,255,255,0.14); }
 .var-card .duo i { width:18px; height:18px; border-radius:50%; border:1px solid rgba(255,255,255,0.22); }
 .var-card .duo i + i { margin-left:-6px; }
-.var-card .nm { display:block; font-family: var(--serif); font-size: 1.3rem; line-height:1; }
+.var-card .nm { display:block; font-family: var(--serif); font-size: 1.55rem; line-height:1; }
 .var-card .ds { display:block; font-size:0.68rem; letter-spacing:0.05em; color: var(--on-night-faint); margin-top:0.3rem; }
 
 .field { margin-top: 1rem; }
@@ -402,7 +394,7 @@ img { display:block; max-width:100%; }
 .confirm-mark { width:56px; height:56px; border-radius:50%; border:1px solid var(--accent); color: var(--accent); display:grid; place-items:center; font-size:1.5rem; margin-bottom:1.4rem; }
 .confirm-detail { color: var(--on-night-soft); }
 .confirm-detail b { color: var(--on-night); font-weight: 500; }
-@media (max-width:860px){ .reserve-grid{ grid-template-columns:1fr; } .var-choices{ grid-template-columns:1fr; } }
+@media (max-width:860px){ .reserve-grid{ grid-template-columns:1fr; align-items:start; } .var-choices{ grid-template-columns:1fr; } }
 
 /* ---------- Badge circulaire flottant ---------- */
 .float-cta {
@@ -431,12 +423,6 @@ img { display:block; max-width:100%; }
 @media (max-width: 800px){ .care{ grid-template-columns:1fr; gap:2rem; } }
 @media (max-width: 520px){ .care-cols{ grid-template-columns:1fr; } }
 
-/* ---------- Animations canvas (bois) ---------- */
-.lathe-wrap { margin: clamp(2.5rem,6vw,5rem) auto 0; max-width: 760px; display:flex; flex-direction:column; align-items:center; gap: 1.1rem; }
-.lathe { width: 100%; height: auto; aspect-ratio: 1100 / 640; display:block; }
-.lathe-cap { font-family: var(--serif); font-style: italic; font-size: 0.92rem; color: #9a8f7e; text-align:center; }
-.motif { width: 100%; max-width: 200px; height: auto; aspect-ratio: 1; display:block; margin-top: 1.8rem; }
-
 /* ---------- Sections MATIÈRE (bois / faïence) ---------- */
 .matter-sec { position: relative; overflow: hidden; }
 .matter-sec > .wrap { position: relative; z-index: 1; }
@@ -451,24 +437,44 @@ img { display:block; max-width:100%; }
   border-bottom: 1px solid var(--line-l);
 }
 .fabrication-intro h2 { font-size: clamp(2.2rem,5.5vw,4.2rem); margin: 1rem 0 1.5rem; }
+.creator-quote {
+  max-width: 58ch;
+  color: var(--ink-soft);
+}
+.creator-quote p {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  line-height: 1.45;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.quote-signature {
+  display: block;
+  margin-top: 1.15rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a7f6f;
+}
 .fabrication-map {
   width: min(100%, 360px);
   justify-self: center;
   opacity: 0.68;
   mix-blend-mode: multiply;
 }
-.bg-spin {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: clamp(420px, 52vw, 820px); height: auto; aspect-ratio: 1;
-  opacity: 0.45; pointer-events: none; z-index: 0;
-}
-.bg-spin-left { left: clamp(-22rem, -14vw, -7rem); }
-.bg-spin-right { right: clamp(-22rem, -14vw, -7rem); }
 .matter-head { max-width: 760px; }
 .matter-head h2 { font-size: clamp(2.2rem,5.5vw,4.2rem); margin-top: 1rem; }
 .matter { display:grid; grid-template-columns: 0.92fr 1.08fr; gap: clamp(2rem,5vw,5rem); align-items:center; margin-top: clamp(2.5rem,6vw,4.5rem); }
+.matter-media { aspect-ratio: 4/3; }
 .matter.flip .matter-media { order: 2; }
-.matter-media .ms { aspect-ratio: 4/5; border-radius: 4px; }
+.matter-media .ms { width: 100%; height: 100%; display: block; border-radius: 4px; }
+.matter-media .engraving-slot {
+  background: #efe2cc;
+  border: 1px solid var(--line-l);
+}
 .matter-copy .lede { color: var(--ink); }
 .matter-copy .body-text { margin-top: 1.3rem; }
 .matter-care { margin-top: 1.8rem; border-top: 1px solid var(--line-l); padding-top: 1.1rem; font-size: 0.92rem; color: var(--ink-soft); }
@@ -621,22 +627,18 @@ html.js .reveal.in { opacity: 1; transform: none; }
     font-size: clamp(2.1rem, 12vw, 3.2rem);
   }
   .matter { margin-top: 2rem; }
-  .matter-media .ms {
+  .matter-media {
     aspect-ratio: 4 / 3;
     max-height: 430px;
+  }
+  .matter-media .ms {
+    max-height: none;
   }
   .matter-copy .lede { font-size: clamp(1.45rem, 8vw, 2rem); }
   .fabrication-close {
     text-align: left;
     margin-top: 2.6rem;
   }
-  .bg-spin {
-    width: clamp(300px, 92vw, 460px);
-    opacity: 0.25;
-  }
-  .bg-spin-left { left: -13rem; top: 39%; }
-  .bg-spin-right { right: -13rem; top: 42%; }
-
   .designer {
     gap: 1.8rem;
   }
@@ -652,13 +654,6 @@ html.js .reveal.in { opacity: 1; transform: none; }
     overflow-wrap: anywhere;
     word-break: break-word;
   }
-  .hands { margin-top: 3.2rem; padding-top: 2.6rem; }
-  .hands-head { text-align: left; }
-  .hands-head .eyebrow { justify-content: flex-start; }
-  .hands-intro { margin-left: 0; margin-right: 0; }
-  .hand-media { aspect-ratio: 4 / 3; }
-  .hand-name { font-size: 1.45rem; }
-
   .reserve-grid { gap: 2rem; }
   .price { font-size: clamp(3.2rem, 18vw, 4.6rem); }
   .launch-note { max-width: none; }
@@ -706,9 +701,7 @@ html.js .reveal.in { opacity: 1; transform: none; }
 }
 
 @media (max-width: 430px) {
-  .vrow-media .media,
-  .matter-media .ms,
-  .hand-media { aspect-ratio: 1 / 1; }
+  .vrow-media .media { aspect-ratio: 1 / 1; }
   .reserve-stats { grid-template-columns: 1fr; }
   .steps-ind .dot span { display: none; }
   .steps-ind .sep { margin-top: 13px; }
