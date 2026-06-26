@@ -472,7 +472,8 @@ img { display:block; max-width:100%; }
 .matter.flip .matter-media { order: 2; }
 .matter-media .ms { width: 100%; height: 100%; display: block; border-radius: 4px; }
 .matter-media .engraving-slot {
-  background: #efe2cc;
+  --slot-bg: var(--paper);
+  background: var(--paper);
   border: 1px solid var(--line-l);
 }
 .matter-copy .lede { color: var(--ink); }
