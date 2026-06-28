@@ -551,6 +551,7 @@ img { display:block; max-width:100%; }
 .foot-grid { display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
 .foot-brand { font-family: var(--serif); font-size: 2.6rem; line-height:1; color:#fff; }
 .foot-meta { font-size: 0.78rem; color: var(--on-night-soft); max-width: 34ch; }
+.foot-trademark { max-width: var(--maxw); margin: 2rem auto 0; padding: 0 var(--pad); color: var(--on-night-faint); }
 .foot-link { color: var(--accent); text-decoration: none; border-bottom:1px solid currentColor; }
 
 /* ---------- Révélations (filet JS — cf. arbol-v2.js) ---------- */
