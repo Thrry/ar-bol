@@ -42,7 +42,7 @@ async function brevoGet(env, path) {
   return { ok: true, status: response.status, body };
 }
 
-export async function onRequestGet({ request, env }) {
+async function handleAdminDashboard(request, env) {
   if (!requireAdmin(request, env)) {
     return json({ ok: false, error: "unauthorized" }, 401);
   }
@@ -75,3 +75,14 @@ export async function onRequestGet({ request, env }) {
   }, 200);
 }
 
+export async function onRequestGet({ request, env }) {
+  try {
+    return await handleAdminDashboard(request, env);
+  } catch (error) {
+    return json({
+      ok: false,
+      error: "admin_dashboard_error",
+      detail: error && error.message ? error.message : String(error),
+    }, 500);
+  }
+}
