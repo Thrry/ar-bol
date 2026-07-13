@@ -1,0 +1,50 @@
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p dist
+          rsync -a --delete \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'docs' \
+            --exclude 'README.md' \
+            --exclude 'TODO.md' \
+            --exclude 'node_modules' \
+            ./ dist/
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          npx --yes wrangler@latest pages deploy dist \
+            --project-name=ar-bol \
+            --branch=main \
+            --commit-dirty=false
