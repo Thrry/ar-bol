@@ -43,6 +43,54 @@ Le `.nojekyll` (déjà présent) empêche Jekyll de filtrer des fichiers.
 
 **Mises à jour ultérieures :** `git add . && git commit -m "maj" && git push`.
 
+## 2 bis. Brancher Brevo
+
+Le formulaire de commande et la liste d'attente appellent
+`/api/brevo-contact`. Cet endpoint est dans `functions/api/brevo-contact.js` et
+doit tourner côté serveur, par exemple via Cloudflare Pages Functions.
+
+Ne jamais mettre la clé Brevo dans `index.html` ou `arbol-v2.js`.
+
+Variables à configurer côté hébergeur :
+
+```bash
+BREVO_API_KEY=...
+BREVO_LIST_IDS=...
+ARBOL_OWNER_EMAIL=kevinguiricouderc@gmail.com
+ARBOL_OWNER_NAME=Kevin Guiri Couderc
+BREVO_SENDER_EMAIL=...
+BREVO_SENDER_NAME=Ar-bol
+```
+
+`BREVO_LIST_IDS` est optionnel. S'il est vide, le contact est créé ou mis à jour
+dans Brevo sans être ajouté à une liste précise. En local, copier
+`.dev.vars.example` vers `.dev.vars` puis renseigner les valeurs ; `.dev.vars`
+est ignoré par Git.
+
+Après création ou mise à jour du contact, l'endpoint tente aussi d'envoyer un
+email transactionnel au propriétaire Ar-bol. `ARBOL_OWNER_EMAIL` vaut
+`kevinguiricouderc@gmail.com` par défaut. `BREVO_SENDER_EMAIL` doit correspondre
+à un expéditeur vérifié dans Brevo, sinon le contact sera bien enregistré mais
+la notification email ne partira pas.
+
+GitHub Pages ne peut pas exécuter cet endpoint serverless. Si le site est servi
+uniquement par GitHub Pages, la commande redirige quand même vers Stripe, mais la
+liste d'attente peut afficher une erreur d'enregistrement. Il faut publier le
+même dossier via Cloudflare Pages, Netlify, Vercel ou ajouter un autre proxy
+serveur qui garde la clé Brevo privée.
+
+## 2 ter. Paiement Stripe
+
+La commande est branchée en mode test avec des Stripe Payment Links publics, un
+lien par composition (`Unan`, `Daou`, `Tri`, `Pevar`). Le site tente d'abord
+d'enregistrer le contact dans Brevo, puis redirige vers Stripe ; si Brevo est
+indisponible, la redirection Stripe reste active.
+
+Les clés secrètes Stripe ne doivent jamais être ajoutées au repo. Les liens de
+test sont dans `arbol-v2.js` car ce sont des URL publiques Stripe. Pour passer
+en production, créer les quatre Payment Links en mode live, puis remplacer
+uniquement les URL dans `stripeLinks`.
+
 ## 3. Structure des fichiers
 
 ```
@@ -67,7 +115,7 @@ site-claude-design/
 8. **Finistère** — fond filigrane carte (crayon, multiply)
 9. **Le designer** — portrait + bio, puis « Les mains d'Ar-bol » (tourneur + potière)
 10. **Série limitée** (Chapitre V) — jauge des 50 (12 réservées s'allument)
-11. **Réservation** (Chapitre VI) — parcours guidé 3 étapes : variation → acompte → confirmation, + bandeau confiance
+11. **Commande** (Chapitre VI) — parcours guidé 3 étapes : composition → paiement Stripe → confirmation, + bandeau confiance
 12. **Liste d'attente** — formulaire email (validation front)
 13. **Footer**
 
@@ -91,10 +139,10 @@ site-claude-design/
 
 - **Noms d'ateliers/artisans** : Gwenaël Tanguy (tourneur), Annaïg Le Goff (potière)
   sont **inventés** — à confirmer/remplacer (mention déjà présente sur le site).
-- **Paiement** : l'étape « acompte » est une **démo** (pas de Stripe réel branché).
-  Brancher un vrai prestataire (Stripe Checkout / lien de paiement) côté étape 2.
-- **Liste d'attente** : le formulaire valide l'email côté client mais **n'envoie
-  rien** — connecter à un service (Formspree, Buttondown, API maison…).
+- **Paiement** : Stripe est branché en mode test via Payment Links publics.
+  Remplacer les liens test par les liens live avant ouverture commerciale.
+- **Liste d'attente** : le formulaire enregistre le contact dans Brevo via
+  `/api/brevo-contact` lorsque l'endpoint serverless est disponible.
 - **Images** : ce sont des visuels générés ; remplacer par les photos finales HD
   quand disponibles (mêmes noms de fichiers dans `assets/` = aucun changement de code).
 - **Poids** : ~30 Mo d'images PNG. Pour accélérer le chargement, convertir en WebP.

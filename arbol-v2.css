@@ -391,6 +391,7 @@ img { display:block; max-width:100%; }
 .step-actions { display:flex; gap:0.8rem; align-items:center; margin-top:1.8rem; }
 .step-actions .spacer { flex:1; }
 .secure-note { font-size:0.74rem; color: var(--on-night-faint); margin-top: 1.1rem; }
+.secure-note.error { color: #d7a0a0; }
 .confirm-mark { width:56px; height:56px; border-radius:50%; border:1px solid var(--accent); color: var(--accent); display:grid; place-items:center; font-size:1.5rem; margin-bottom:1.4rem; }
 .confirm-detail { color: var(--on-night-soft); }
 .confirm-detail b { color: var(--on-night); font-weight: 500; }
@@ -474,7 +475,7 @@ img { display:block; max-width:100%; }
 .matter-media .engraving-slot {
   --slot-bg: var(--paper);
   background: var(--paper);
-  border: 1px solid var(--line-l);
+  border: 0;
 }
 .matter-copy .lede { color: var(--ink); }
 .matter-copy .body-text { margin-top: 1.3rem; }

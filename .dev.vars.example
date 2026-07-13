@@ -1,0 +1,8 @@
+BREVO_API_KEY=xkeysib-your-api-key
+# Optional: comma-separated Brevo list ids, for example: 3,8
+BREVO_LIST_IDS=
+ARBOL_OWNER_EMAIL=kevinguiricouderc@gmail.com
+ARBOL_OWNER_NAME=Kevin Guiri Couderc
+# Must be a verified sender in Brevo.
+BREVO_SENDER_EMAIL=kevinguiricouderc@gmail.com
+BREVO_SENDER_NAME=Ar-bol

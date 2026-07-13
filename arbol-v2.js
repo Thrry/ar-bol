@@ -124,6 +124,40 @@
 
   /* ---------- Commande / paiement ---------- */
   var state = { variant: null };
+  var stripeLinks = {
+    Unan: "https://buy.stripe.com/test_14A7sN3Rv1lN5vo1Un7Zu00",
+    Daou: "https://buy.stripe.com/test_9B6cN773H4xZf5YeH97Zu01",
+    Tri: "https://buy.stripe.com/test_5kQaEZbjX4xZcXQ0Qj7Zu02",
+    Pevar: "https://buy.stripe.com/test_bJefZjco1c0r2jc0Qj7Zu03"
+  };
+  var variantSlugs = { Unan: "unan", Daou: "daou", Tri: "tri", Pevar: "pevar" };
+  var variantsBySlug = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
+  var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  function langHtml(fr, en) {
+    return '<span lang="fr">' + fr + '</span><span lang="en">' + en + '</span>';
+  }
+  function submitBrevoContact(payload) {
+    return fetch("api/brevo-contact", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function (res) {
+      if (!res.ok) throw new Error("brevo_contact_failed");
+      return res.json();
+    });
+  }
+  function buildStripeUrl(variant) {
+    var link = stripeLinks[variant];
+    if (!link) return null;
+    var slug = variantSlugs[variant] || variant.toLowerCase();
+    var url = new URL(link);
+    url.searchParams.set("client_reference_id", "arbol_" + slug + "_" + Date.now());
+    url.searchParams.set("utm_source", "arbol_site");
+    url.searchParams.set("utm_medium", "website");
+    url.searchParams.set("utm_campaign", "edition_lancement");
+    url.searchParams.set("utm_content", slug);
+    return url.toString();
+  }
   var steps = document.querySelectorAll(".panel .step");
   var dots = document.querySelectorAll("#stepsInd .dot");
   function gotoStep(n) {
@@ -148,9 +182,10 @@
   var lName = document.getElementById("lName");
   var email = document.getElementById("email");
   var payBtn = document.getElementById("pay");
+  var secureNote = document.querySelector(".secure-note");
   function validPay() {
     var okName = fName.value.trim().length > 0;
-    var okEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim());
+    var okEmail = emailRe.test(email.value.trim());
     payBtn.disabled = !(okName && okEmail && state.variant);
   }
   [fName, lName, email].forEach(function (inp) { inp.addEventListener("input", validPay); });
@@ -163,18 +198,33 @@
   });
   payBtn.addEventListener("click", function () {
     if (payBtn.disabled) return;
-    var nm = fName.value.trim();
+    var stripeUrl = buildStripeUrl(state.variant);
+    if (!stripeUrl) {
+      if (secureNote) {
+        secureNote.innerHTML = langHtml("Lien Stripe manquant pour cette composition.", "Stripe payment link is missing for this composition.");
+        secureNote.classList.add("error");
+      }
+      return;
+    }
     var labels = payBtn.querySelectorAll("span[lang]");
     payBtn.disabled = true;
-    labels.forEach(function (s) { s.dataset.orig = s.textContent; s.textContent = s.getAttribute("lang") === "fr" ? "Traitement…" : "Processing…"; });
-    setTimeout(function () {
-      document.getElementById("confName").textContent = nm;
-      document.getElementById("confNameEn").textContent = nm;
-      document.getElementById("confVar").textContent = state.variant;
-      document.getElementById("confVarEn").textContent = state.variant;
-      gotoStep(3);
-      labels.forEach(function (s) { if (s.dataset.orig) s.textContent = s.dataset.orig; });
-    }, 1100);
+    labels.forEach(function (s) { s.dataset.orig = s.textContent; s.textContent = s.getAttribute("lang") === "fr" ? "Ouverture Stripe…" : "Opening Stripe…"; });
+    try {
+      sessionStorage.setItem("arbolPendingOrder", JSON.stringify({
+        variant: state.variant
+      }));
+    } catch (e) {}
+    submitBrevoContact({
+      source: "order",
+      email: email.value.trim(),
+      firstName: fName.value.trim(),
+      lastName: lName.value.trim(),
+      variant: state.variant
+    }).then(function () {
+      window.location.href = stripeUrl;
+    }).catch(function () {
+      window.location.href = stripeUrl;
+    });
   });
   document.getElementById("restart").addEventListener("click", function () {
     state = { variant: null };
@@ -183,6 +233,18 @@
     fName.value = ""; lName.value = ""; email.value = "";
     gotoStep(1);
   });
+  (function restoreStripeReturn() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get("payment") !== "success") return;
+    var pending = {};
+    try { pending = JSON.parse(sessionStorage.getItem("arbolPendingOrder") || "{}"); } catch (e) {}
+    var variant = variantsBySlug[params.get("composition")] || pending.variant || "—";
+    document.getElementById("confVar").textContent = variant;
+    document.getElementById("confVarEn").textContent = variant;
+    try { sessionStorage.removeItem("arbolPendingOrder"); } catch (e) {}
+    gotoStep(3);
+    if (reserveSec) reserveSec.scrollIntoView({ block: "start" });
+  })();
 
   /* ---------- Édition : jauge de rareté (50 traits, 12 commandés) ---------- */
   var tally = document.getElementById("tally");
@@ -214,11 +276,24 @@
       e.preventDefault();
       var inp = document.getElementById("wlEmail");
       var done = document.getElementById("wlDone");
-      var ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(inp.value.trim());
+      var btn = wlForm.querySelector("button[type='submit']");
+      var ok = emailRe.test(inp.value.trim());
       if (!ok) { inp.focus(); inp.style.borderColor = "#b66"; return; }
       inp.style.borderColor = "";
-      wlForm.style.display = "none";
-      done.innerHTML = '<span lang="fr">Merci — vous êtes sur la liste.</span><span lang="en">Thank you — you\'re on the list.</span>';
+      btn.disabled = true;
+      done.innerHTML = langHtml("Enregistrement…", "Saving…");
+      submitBrevoContact({
+        source: "waitlist",
+        email: inp.value.trim()
+      }).then(function () {
+        wlForm.style.display = "none";
+        done.innerHTML = langHtml("Merci — vous êtes sur la liste.", "Thank you — you're on the list.");
+      }).catch(function () {
+        btn.disabled = false;
+        inp.focus();
+        inp.style.borderColor = "#b66";
+        done.innerHTML = langHtml("Impossible d'enregistrer cet email pour le moment.", "This email could not be saved right now.");
+      });
     });
   }
 
