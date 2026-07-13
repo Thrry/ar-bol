@@ -1,6 +1,7 @@
 const BREVO_CONTACTS_URL = "https://api.brevo.com/v3/contacts";
 const BREVO_EMAIL_URL = "https://api.brevo.com/v3/smtp/email";
 const DEFAULT_OWNER_EMAIL = "contact@ar-bol.fr";
+const DEFAULT_SENDER_EMAIL = "kevinguiricouderc@gmail.com";
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 function json(body, status) {
@@ -43,7 +44,7 @@ function escapeHtml(value) {
 async function sendOwnerNotification(env, contact) {
   const ownerEmail = cleanText(env.ARBOL_OWNER_EMAIL, 254) || DEFAULT_OWNER_EMAIL;
   const ownerName = cleanText(env.ARBOL_OWNER_NAME, 80) || "Kevin Guiri Couderc";
-  const senderEmail = cleanText(env.BREVO_SENDER_EMAIL, 254) || ownerEmail;
+  const senderEmail = cleanText(env.BREVO_SENDER_EMAIL, 254) || DEFAULT_SENDER_EMAIL;
   const senderName = cleanText(env.BREVO_SENDER_NAME, 80) || "Ar-bol";
   const title = contactLabel(contact.source);
   const fullName = [contact.firstName, contact.lastName].filter(Boolean).join(" ");

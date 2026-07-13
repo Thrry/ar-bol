@@ -1,6 +1,6 @@
 const STRIPE_CHECKOUT_SESSIONS_URL = "https://api.stripe.com/v1/checkout/sessions";
 const DEFAULT_EDITION_SIZE = 50;
-const DEFAULT_BASE_ORDERED = 12;
+const DEFAULT_BASE_ORDERED = 15;
 const MAX_PAGES = 20;
 
 function json(body, status, cacheControl) {

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ar-bol - Dashboard</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f1eb;
+    --panel: #fffaf2;
+    --ink: #1c1915;
+    --muted: #6f665c;
+    --line: #ddd4c6;
+    --accent: #705a37;
+    --ok: #2f6f4e;
+    --warn: #9b5d19;
+    --bad: #9f3434;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 2rem clamp(1rem, 4vw, 3rem) 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 500; }
+  main { padding: 1.25rem clamp(1rem, 4vw, 3rem) 3rem; }
+  .toolbar, .grid, .panel { max-width: 1180px; margin-inline: auto; }
+  .toolbar {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  input, button {
+    height: 2.5rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: white;
+    color: var(--ink);
+    padding: 0 .75rem;
+    font: inherit;
+  }
+  input { min-width: min(26rem, 100%); }
+  button {
+    cursor: pointer;
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .75rem;
+    margin-bottom: 1rem;
+  }
+  .metric, .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .metric { padding: 1rem; }
+  .metric b { display: block; font-size: 1.7rem; line-height: 1; margin-bottom: .4rem; }
+  .metric span, .status { color: var(--muted); }
+  .panel { overflow: hidden; margin-bottom: 1rem; }
+  .panel h2 {
+    margin: 0;
+    padding: .9rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--line);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: .75rem 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  .pill {
+    display: inline-block;
+    padding: .18rem .48rem;
+    border-radius: 999px;
+    background: #ebe2d4;
+    color: var(--accent);
+    font-size: .78rem;
+    font-weight: 600;
+  }
+  .pill.delivered, .pill.opened { color: var(--ok); background: #dfecdf; }
+  .pill.error, .pill.hard_bounce, .pill.soft_bounce { color: var(--bad); background: #f3dddd; }
+  .empty, .error { padding: 1rem; color: var(--muted); }
+  .error { color: var(--bad); }
+  @media (max-width: 850px) {
+    header, .toolbar { align-items: stretch; flex-direction: column; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    table { display: block; overflow-x: auto; }
+  }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Ar-bol Dashboard</h1>
+    <div class="status" id="status">Non connecté</div>
+  </div>
+  <a href="/" style="color:var(--accent)">Retour au site</a>
+</header>
+<main>
+  <div class="toolbar">
+    <input type="password" id="token" placeholder="Token admin" autocomplete="current-password">
+    <button type="button" id="load">Charger</button>
+  </div>
+  <section class="grid">
+    <div class="metric"><b id="mContacts">-</b><span>Contacts Brevo</span></div>
+    <div class="metric"><b id="mEvents">-</b><span>Événements email</span></div>
+    <div class="metric"><b id="mDelivered">-</b><span>Livrés</span></div>
+    <div class="metric"><b id="mErrors">-</b><span>Erreurs</span></div>
+  </section>
+  <section class="panel">
+    <h2>Configuration Brevo</h2>
+    <div id="config"></div>
+  </section>
+  <section class="panel">
+    <h2>Événements emails récents</h2>
+    <div id="events"></div>
+  </section>
+  <section class="panel">
+    <h2>Contacts récents</h2>
+    <div id="contacts"></div>
+  </section>
+</main>
+<script>
+(function () {
+  "use strict";
+
+  var tokenInput = document.getElementById("token");
+  var statusEl = document.getElementById("status");
+  var loadBtn = document.getElementById("load");
+  var saved = localStorage.getItem("arbol-admin-token") || "";
+  var urlToken = new URLSearchParams(window.location.search).get("token") || "";
+  tokenInput.value = urlToken || saved;
+
+  function esc(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function eventPill(event) {
+    return '<span class="pill ' + esc(event) + '">' + esc(event || "-") + "</span>";
+  }
+
+  function setMetric(id, value) {
+    document.getElementById(id).textContent = String(value);
+  }
+
+  function renderTable(targetId, columns, rows, emptyText) {
+    var target = document.getElementById(targetId);
+    if (!rows.length) {
+      target.innerHTML = '<div class="empty">' + esc(emptyText) + "</div>";
+      return;
+    }
+    target.innerHTML = "<table><thead><tr>" + columns.map(function (col) {
+      return "<th>" + esc(col.label) + "</th>";
+    }).join("") + "</tr></thead><tbody>" + rows.map(function (row) {
+      return "<tr>" + columns.map(function (col) {
+        return "<td>" + col.render(row) + "</td>";
+      }).join("") + "</tr>";
+    }).join("") + "</tbody></table>";
+  }
+
+  function render(data) {
+    var events = data.events || [];
+    var contacts = data.contacts || [];
+    setMetric("mContacts", contacts.length);
+    setMetric("mEvents", events.length);
+    setMetric("mDelivered", events.filter(function (e) { return e.event === "delivered" || e.event === "opened"; }).length);
+    setMetric("mErrors", events.filter(function (e) { return e.event === "error" || e.event === "hard_bounce" || e.event === "soft_bounce"; }).length);
+
+    document.getElementById("config").innerHTML =
+      '<table><tbody>' +
+      '<tr><th>Destinataire notifications</th><td>' + esc(data.ownerEmail) + '</td></tr>' +
+      '<tr><th>Sender Brevo</th><td>' + esc(data.senderEmail) + '</td></tr>' +
+      '<tr><th>Senders validés</th><td>' + esc((data.senders || []).map(function (s) { return s.email; }).join(", ") || "-") + '</td></tr>' +
+      '<tr><th>Domaines Brevo</th><td>' + esc((data.domains || []).map(function (d) { return d.domain_name || d.name || d.domain; }).join(", ") || "Aucun") + '</td></tr>' +
+      '</tbody></table>';
+
+    renderTable("events", [
+      { label: "Date", render: function (row) { return esc(row.date || "-"); } },
+      { label: "Événement", render: function (row) { return eventPill(row.event); } },
+      { label: "À", render: function (row) { return esc(row.email || "-"); } },
+      { label: "Sujet", render: function (row) { return esc(row.subject || "-"); } },
+      { label: "Depuis", render: function (row) { return esc(row.from || "-"); } },
+      { label: "Détail", render: function (row) { return esc(row.reason || row.messageId || "-"); } }
+    ], events, "Aucun événement email récent.");
+
+    renderTable("contacts", [
+      { label: "Email", render: function (row) { return esc(row.email || "-"); } },
+      { label: "Créé", render: function (row) { return esc(row.createdAt || "-"); } },
+      { label: "Modifié", render: function (row) { return esc(row.modifiedAt || "-"); } },
+      { label: "Listes", render: function (row) { return esc((row.listIds || []).join(", ") || "-"); } },
+      { label: "Blacklist", render: function (row) { return esc(row.emailBlacklisted ? "oui" : "non"); } }
+    ], contacts, "Aucun contact Brevo récent.");
+  }
+
+  function load() {
+    var token = tokenInput.value.trim();
+    if (!token) return;
+    localStorage.setItem("arbol-admin-token", token);
+    statusEl.textContent = "Chargement...";
+    fetch("/api/admin/brevo-dashboard", { headers: { "x-admin-token": token } })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        statusEl.textContent = "Mis à jour : " + new Date(data.generatedAt).toLocaleString("fr-FR");
+        render(data);
+      })
+      .catch(function (error) {
+        statusEl.textContent = "Erreur";
+        document.getElementById("events").innerHTML = '<div class="error">' + esc(error.message) + "</div>";
+      });
+  }
+
+  loadBtn.addEventListener("click", load);
+  if (tokenInput.value) load();
+})();
+</script>
+</body>
+</html>
+

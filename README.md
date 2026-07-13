@@ -60,8 +60,9 @@ ARBOL_OWNER_EMAIL=contact@ar-bol.fr
 ARBOL_OWNER_NAME=Kevin Guiri Couderc
 BREVO_SENDER_EMAIL=...
 BREVO_SENDER_NAME=Ar-bol
+ARBOL_ADMIN_TOKEN=...
 STRIPE_SECRET_KEY=...
-ARBOL_ORDER_BASE_COUNT=12
+ARBOL_ORDER_BASE_COUNT=15
 ARBOL_EDITION_SIZE=50
 ARBOL_STRIPE_COUNT_SINCE=2026-07-13
 STRIPE_PAYMENT_LINK_IDS=...
@@ -75,8 +76,20 @@ est ignoré par Git.
 Après création ou mise à jour du contact, l'endpoint tente aussi d'envoyer un
 email transactionnel au propriétaire Ar-bol. `ARBOL_OWNER_EMAIL` vaut
 `contact@ar-bol.fr` par défaut. `BREVO_SENDER_EMAIL` doit correspondre
-à un expéditeur vérifié dans Brevo, sinon le contact sera bien enregistré mais
-la notification email ne partira pas.
+à un expéditeur vérifié dans Brevo : actuellement
+`kevinguiricouderc@gmail.com`. Ne pas utiliser `contact@ar-bol.fr` comme sender
+tant que le domaine `ar-bol.fr` n'est pas authentifié dans Brevo ; le contact
+sera bien enregistré mais la notification email risque de ne pas arriver.
+
+Le dashboard admin est disponible sur `/dashboard.html`. Il lit les contacts et
+les événements email Brevo via `/api/admin/brevo-dashboard`, protégé par
+`ARBOL_ADMIN_TOKEN`.
+
+Le double opt-in Brevo n'est pas encore activé. Pour une simple demande de
+commande, ce n'est pas nécessaire. Pour une vraie newsletter/liste marketing,
+créer une liste Brevo, un template de confirmation double opt-in, puis brancher
+le formulaire d'attente sur ce flux avant d'envoyer des campagnes. Les campagnes
+Brevo devront aussi contenir leur lien de désinscription natif.
 
 GitHub Pages ne peut pas exécuter cet endpoint serverless. Si le site est servi
 uniquement par GitHub Pages, la commande redirige quand même vers Stripe, mais la
@@ -92,7 +105,7 @@ d'enregistrer le contact dans Brevo, puis redirige vers Stripe ; si Brevo est
 indisponible, la redirection Stripe reste active.
 
 La jauge de série limitée appelle aussi `/api/order-count`. Le compteur public
-ne repart pas de zéro : il affiche `ARBOL_ORDER_BASE_COUNT` (12 par défaut) plus
+ne repart pas de zéro : il affiche `ARBOL_ORDER_BASE_COUNT` (15 par défaut) plus
 les paiements Stripe confirmés à partir de `ARBOL_STRIPE_COUNT_SINCE`.
 Configurer `STRIPE_PAYMENT_LINK_IDS` avec les IDs `plink_...` des quatre liens
 est recommandé pour éviter de compter une autre session Stripe. Si cette

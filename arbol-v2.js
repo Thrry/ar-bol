@@ -239,8 +239,10 @@
     var pending = {};
     try { pending = JSON.parse(sessionStorage.getItem("arbolPendingOrder") || "{}"); } catch (e) {}
     var variant = variantsBySlug[params.get("composition")] || pending.variant || "—";
-    document.getElementById("confVar").textContent = variant;
-    document.getElementById("confVarEn").textContent = variant;
+    var confVar = document.getElementById("confVar");
+    var confVarEn = document.getElementById("confVarEn");
+    if (confVar) confVar.textContent = variant;
+    if (confVarEn) confVarEn.textContent = variant;
     try { sessionStorage.removeItem("arbolPendingOrder"); } catch (e) {}
     gotoStep(3);
     if (reserveSec) reserveSec.scrollIntoView({ block: "start" });
@@ -250,7 +252,7 @@
   var tally = document.getElementById("tally");
   if (tally) {
     var editionSize = parseInt(tally.getAttribute("data-edition-size"), 10) || 50;
-    var orderedCount = parseInt(tally.getAttribute("data-ordered-count"), 10) || 12;
+    var orderedCount = parseInt(tally.getAttribute("data-ordered-count"), 10) || 15;
     var orderedLabel = document.getElementById("orderedCount");
     var availableLabel = document.getElementById("availableCount");
 
