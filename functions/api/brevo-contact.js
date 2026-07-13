@@ -1,6 +1,6 @@
 const BREVO_CONTACTS_URL = "https://api.brevo.com/v3/contacts";
 const BREVO_EMAIL_URL = "https://api.brevo.com/v3/smtp/email";
-const DEFAULT_OWNER_EMAIL = "kevinguiricouderc@gmail.com";
+const DEFAULT_OWNER_EMAIL = "contact@ar-bol.fr";
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 function json(body, status) {

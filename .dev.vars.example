@@ -1,8 +1,17 @@
 BREVO_API_KEY=xkeysib-your-api-key
 # Optional: comma-separated Brevo list ids, for example: 3,8
 BREVO_LIST_IDS=
-ARBOL_OWNER_EMAIL=kevinguiricouderc@gmail.com
+ARBOL_OWNER_EMAIL=contact@ar-bol.fr
 ARBOL_OWNER_NAME=Kevin Guiri Couderc
 # Must be a verified sender in Brevo.
-BREVO_SENDER_EMAIL=kevinguiricouderc@gmail.com
+BREVO_SENDER_EMAIL=contact@ar-bol.fr
 BREVO_SENDER_NAME=Ar-bol
+STRIPE_SECRET_KEY=sk_test_your-secret-key
+# Manual starting point before Stripe is used for the public counter.
+ARBOL_ORDER_BASE_COUNT=12
+ARBOL_EDITION_SIZE=50
+# Count Stripe payments created from this date/Unix timestamp, then add them to ARBOL_ORDER_BASE_COUNT.
+ARBOL_STRIPE_COUNT_SINCE=2026-07-13
+# Optional but recommended: comma-separated Stripe Payment Link ids, for example plink_123,plink_456.
+# If empty, the counter only counts sessions whose client_reference_id starts with arbol_.
+STRIPE_PAYMENT_LINK_IDS=

@@ -56,10 +56,15 @@ Variables à configurer côté hébergeur :
 ```bash
 BREVO_API_KEY=...
 BREVO_LIST_IDS=...
-ARBOL_OWNER_EMAIL=kevinguiricouderc@gmail.com
+ARBOL_OWNER_EMAIL=contact@ar-bol.fr
 ARBOL_OWNER_NAME=Kevin Guiri Couderc
 BREVO_SENDER_EMAIL=...
 BREVO_SENDER_NAME=Ar-bol
+STRIPE_SECRET_KEY=...
+ARBOL_ORDER_BASE_COUNT=12
+ARBOL_EDITION_SIZE=50
+ARBOL_STRIPE_COUNT_SINCE=2026-07-13
+STRIPE_PAYMENT_LINK_IDS=...
 ```
 
 `BREVO_LIST_IDS` est optionnel. S'il est vide, le contact est créé ou mis à jour
@@ -69,7 +74,7 @@ est ignoré par Git.
 
 Après création ou mise à jour du contact, l'endpoint tente aussi d'envoyer un
 email transactionnel au propriétaire Ar-bol. `ARBOL_OWNER_EMAIL` vaut
-`kevinguiricouderc@gmail.com` par défaut. `BREVO_SENDER_EMAIL` doit correspondre
+`contact@ar-bol.fr` par défaut. `BREVO_SENDER_EMAIL` doit correspondre
 à un expéditeur vérifié dans Brevo, sinon le contact sera bien enregistré mais
 la notification email ne partira pas.
 
@@ -86,10 +91,21 @@ lien par composition (`Unan`, `Daou`, `Tri`, `Pevar`). Le site tente d'abord
 d'enregistrer le contact dans Brevo, puis redirige vers Stripe ; si Brevo est
 indisponible, la redirection Stripe reste active.
 
+La jauge de série limitée appelle aussi `/api/order-count`. Le compteur public
+ne repart pas de zéro : il affiche `ARBOL_ORDER_BASE_COUNT` (12 par défaut) plus
+les paiements Stripe confirmés à partir de `ARBOL_STRIPE_COUNT_SINCE`.
+Configurer `STRIPE_PAYMENT_LINK_IDS` avec les IDs `plink_...` des quatre liens
+est recommandé pour éviter de compter une autre session Stripe. Si cette
+variable est vide, seules les sessions dont `client_reference_id` commence par
+`arbol_` sont comptées. Sans `STRIPE_SECRET_KEY` ou en cas d'erreur Stripe, le
+site garde le compteur manuel.
+
 Les clés secrètes Stripe ne doivent jamais être ajoutées au repo. Les liens de
-test sont dans `arbol-v2.js` car ce sont des URL publiques Stripe. Pour passer
-en production, créer les quatre Payment Links en mode live, puis remplacer
-uniquement les URL dans `stripeLinks`.
+test sont dans `arbol-v2.js` car ce sont des URL publiques Stripe ; la clé
+secrète reste uniquement dans les variables serveur de l'hébergeur. Pour passer
+en production, créer les quatre Payment Links en mode live, remplacer les URL
+dans `stripeLinks`, puis mettre à jour `STRIPE_PAYMENT_LINK_IDS` avec les IDs
+live correspondants.
 
 ## 3. Structure des fichiers
 
@@ -114,7 +130,7 @@ site-claude-design/
 7. **La matière · La faïence** — texte + atelier
 8. **Finistère** — fond filigrane carte (crayon, multiply)
 9. **Le designer** — portrait + bio, puis « Les mains d'Ar-bol » (tourneur + potière)
-10. **Série limitée** (Chapitre V) — jauge des 50 (12 réservées s'allument)
+10. **Série limitée** (Chapitre V) — jauge des 50 synchronisée avec Stripe + socle manuel
 11. **Commande** (Chapitre VI) — parcours guidé 3 étapes : composition → paiement Stripe → confirmation, + bandeau confiance
 12. **Liste d'attente** — formulaire email (validation front)
 13. **Footer**

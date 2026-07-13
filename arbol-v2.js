@@ -246,20 +246,56 @@
     if (reserveSec) reserveSec.scrollIntoView({ block: "start" });
   })();
 
-  /* ---------- Édition : jauge de rareté (50 traits, 12 commandés) ---------- */
+  /* ---------- Édition : jauge de rareté ---------- */
   var tally = document.getElementById("tally");
   if (tally) {
-    for (var ti = 0; ti < 50; ti++) tally.appendChild(document.createElement("i"));
+    var editionSize = parseInt(tally.getAttribute("data-edition-size"), 10) || 50;
+    var orderedCount = parseInt(tally.getAttribute("data-ordered-count"), 10) || 12;
+    var orderedLabel = document.getElementById("orderedCount");
+    var availableLabel = document.getElementById("availableCount");
+
+    function clampCount(value) {
+      var parsed = parseInt(value, 10);
+      if (!Number.isFinite(parsed)) return orderedCount;
+      return Math.max(0, Math.min(parsed, editionSize));
+    }
+
+    function paintTally(count) {
+      ticks.forEach(function (tick, index) {
+        tick.classList.toggle("on", index < count);
+      });
+    }
+
+    function setEditionCount(count) {
+      orderedCount = clampCount(count);
+      tally.setAttribute("data-ordered-count", String(orderedCount));
+      if (orderedLabel) orderedLabel.textContent = String(orderedCount);
+      if (availableLabel) availableLabel.textContent = String(Math.max(editionSize - orderedCount, 0));
+      if (tallyDone) paintTally(orderedCount);
+    }
+
+    function syncEditionCount() {
+      fetch("api/order-count", { headers: { accept: "application/json" } })
+        .then(function (res) { if (!res.ok) throw new Error("order_count_failed"); return res.json(); })
+        .then(function (data) {
+          if (data && typeof data.totalOrdered === "number") setEditionCount(data.totalOrdered);
+        })
+        .catch(function () {});
+    }
+
+    for (var ti = 0; ti < editionSize; ti++) tally.appendChild(document.createElement("i"));
     var ticks = tally.querySelectorAll("i");
     var tallyDone = false;
+    setEditionCount(orderedCount);
+    syncEditionCount();
     var fillTally = function () {
       if (tallyDone) return;
       var r = tally.getBoundingClientRect();
       var vh = window.innerHeight || document.documentElement.clientHeight;
       if (r.top < vh * 0.85 && r.bottom > 0) {
         tallyDone = true;
-        if (reduce) { for (var i = 0; i < 12; i++) ticks[i].classList.add("on"); return; }
-        for (var i = 0; i < 12; i++) {
+        if (reduce) { paintTally(orderedCount); return; }
+        for (var i = 0; i < orderedCount; i++) {
           (function (k) { setTimeout(function () { ticks[k].classList.add("on"); }, 150 + k * 60); })(i);
         }
       }
