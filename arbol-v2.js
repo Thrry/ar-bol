@@ -124,39 +124,64 @@
 
   /* ---------- Commande / paiement ---------- */
   var state = { variant: null };
-  var stripeLinks = {
-    Unan: "https://buy.stripe.com/test_14A7sN3Rv1lN5vo1Un7Zu00",
-    Daou: "https://buy.stripe.com/test_9B6cN773H4xZf5YeH97Zu01",
-    Tri: "https://buy.stripe.com/test_5kQaEZbjX4xZcXQ0Qj7Zu02",
-    Pevar: "https://buy.stripe.com/test_bJefZjco1c0r2jc0Qj7Zu03"
-  };
   var variantSlugs = { Unan: "unan", Daou: "daou", Tri: "tri", Pevar: "pevar" };
   var variantsBySlug = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
+  var apiMeta = document.querySelector('meta[name="chatweb-api-base"]');
+  var chatwebApiBase = apiMeta ? apiMeta.getAttribute("content").replace(/\/$/, "") : "";
+  var chatwebProducts = {};
+  var chatwebShippingRule = null;
+  var chatwebShopReady = false;
   var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
   function langHtml(fr, en) {
     return '<span lang="fr">' + fr + '</span><span lang="en">' + en + '</span>';
   }
-  function submitBrevoContact(payload) {
-    return fetch("api/brevo-contact", {
+  function chatwebPost(path, payload) {
+    var body = new URLSearchParams();
+    Object.keys(payload).forEach(function (key) { body.set(key, payload[key]); });
+    return fetch(chatwebApiBase + path, {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload)
+      headers: { accept: "application/json" },
+      body: body
     }).then(function (res) {
-      if (!res.ok) throw new Error("brevo_contact_failed");
-      return res.json();
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok) throw new Error(data.error || "chatweb_request_failed");
+        return data;
+      });
     });
   }
-  function buildStripeUrl(variant) {
-    var link = stripeLinks[variant];
-    if (!link) return null;
-    var slug = variantSlugs[variant] || variant.toLowerCase();
-    var url = new URL(link);
-    url.searchParams.set("client_reference_id", "arbol_" + slug + "_" + Date.now());
-    url.searchParams.set("utm_source", "arbol_site");
-    url.searchParams.set("utm_medium", "website");
-    url.searchParams.set("utm_campaign", "edition_lancement");
-    url.searchParams.set("utm_content", slug);
-    return url.toString();
+  function submitChatwebContact(email) {
+    return chatwebPost("/newsletter-subscriptions", {
+      "contact[email]": email,
+      "contact[consent]": "1",
+      website: ""
+    });
+  }
+  function currentProduct() {
+    return state.variant ? chatwebProducts[variantSlugs[state.variant]] : null;
+  }
+  function formatMoney(amount, currency) {
+    var locale = root.getAttribute("data-lang") === "en" ? "en-GB" : "fr-FR";
+    return new Intl.NumberFormat(locale, { style: "currency", currency: (currency || "eur").toUpperCase(), maximumFractionDigits: 0 }).format(amount / 100);
+  }
+  function setShopMessage(fr, en, error) {
+    if (!secureNote) return;
+    secureNote.innerHTML = langHtml(fr, en);
+    secureNote.classList.toggle("error", !!error);
+  }
+  function updateProductPrice() {
+    var product = currentProduct();
+    if (!product) return;
+    var price = formatMoney(product.unit_amount, product.currency);
+    var shopPrice = document.getElementById("shopPrice");
+    var recapTotal = document.getElementById("recapTotal");
+    if (shopPrice) shopPrice.textContent = price;
+    if (recapTotal) recapTotal.textContent = price;
+    if (payBtn) {
+      var payFr = payBtn.querySelector('span[lang="fr"]');
+      var payEn = payBtn.querySelector('span[lang="en"]');
+      if (payFr) payFr.textContent = "Payer — " + new Intl.NumberFormat("fr-FR", { style: "currency", currency: product.currency.toUpperCase(), maximumFractionDigits: 0 }).format(product.unit_amount / 100);
+      if (payEn) payEn.textContent = "Pay — " + new Intl.NumberFormat("en-GB", { style: "currency", currency: product.currency.toUpperCase(), maximumFractionDigits: 0 }).format(product.unit_amount / 100);
+    }
   }
   var steps = document.querySelectorAll(".panel .step");
   var dots = document.querySelectorAll("#stepsInd .dot");
@@ -171,6 +196,7 @@
       varCards.forEach(function (c) { c.classList.remove("sel"); });
       card.classList.add("sel");
       state.variant = card.getAttribute("data-var");
+      updateProductPrice();
       toStep2.disabled = false;
     });
   });
@@ -186,7 +212,7 @@
   function validPay() {
     var okName = fName.value.trim().length > 0;
     var okEmail = emailRe.test(email.value.trim());
-    payBtn.disabled = !(okName && okEmail && state.variant);
+    payBtn.disabled = !(okName && okEmail && state.variant && currentProduct() && chatwebShippingRule && chatwebShopReady);
   }
   [fName, lName, email].forEach(function (inp) { inp.addEventListener("input", validPay); });
 
@@ -198,14 +224,7 @@
   });
   payBtn.addEventListener("click", function () {
     if (payBtn.disabled) return;
-    var stripeUrl = buildStripeUrl(state.variant);
-    if (!stripeUrl) {
-      if (secureNote) {
-        secureNote.innerHTML = langHtml("Lien Stripe manquant pour cette composition.", "Stripe payment link is missing for this composition.");
-        secureNote.classList.add("error");
-      }
-      return;
-    }
+    var product = currentProduct();
     var labels = payBtn.querySelectorAll("span[lang]");
     payBtn.disabled = true;
     labels.forEach(function (s) { s.dataset.orig = s.textContent; s.textContent = s.getAttribute("lang") === "fr" ? "Ouverture Stripe…" : "Opening Stripe…"; });
@@ -214,16 +233,19 @@
         variant: state.variant
       }));
     } catch (e) {}
-    submitBrevoContact({
-      source: "order",
-      email: email.value.trim(),
-      firstName: fName.value.trim(),
-      lastName: lName.value.trim(),
-      variant: state.variant
-    }).then(function () {
-      window.location.href = stripeUrl;
+    chatwebPost("/shop/checkout", {
+      "checkout[product_slug]": product.slug,
+      "checkout[quantity]": "1",
+      "checkout[customer_email]": email.value.trim(),
+      "checkout[customer_name]": (fName.value.trim() + " " + lName.value.trim()).trim(),
+      "checkout[shipping_rule_id]": String(chatwebShippingRule.id)
+    }).then(function (data) {
+      if (!data.checkout_url) throw new Error("checkout_url_missing");
+      window.location.href = data.checkout_url;
     }).catch(function () {
-      window.location.href = stripeUrl;
+      labels.forEach(function (s) { s.textContent = s.dataset.orig || s.textContent; });
+      setShopMessage("Le paiement est momentanément indisponible. Réessayez dans un instant.", "Payment is temporarily unavailable. Please try again shortly.", true);
+      validPay();
     });
   });
   document.getElementById("restart").addEventListener("click", function () {
@@ -247,6 +269,28 @@
     gotoStep(3);
     if (reserveSec) reserveSec.scrollIntoView({ block: "start" });
   })();
+
+  fetch(chatwebApiBase + "/shop", { headers: { accept: "application/json" } })
+    .then(function (res) { if (!res.ok) throw new Error("shop_unavailable"); return res.json(); })
+    .then(function (data) {
+      var shop = data.shop || {};
+      (shop.products || []).forEach(function (product) { chatwebProducts[product.slug] = product; });
+      chatwebShippingRule = (shop.shipping_rules || [])[0] || null;
+      chatwebShopReady = !!shop.checkout_available && !!chatwebShippingRule;
+      var firstProduct = (shop.products || [])[0];
+      if (firstProduct) {
+        var shopPrice = document.getElementById("shopPrice");
+        if (shopPrice) shopPrice.textContent = formatMoney(firstProduct.unit_amount, firstProduct.currency);
+      }
+      if (chatwebShopReady) {
+        setShopMessage("Paiement sécurisé par Stripe, géré par la boutique Ar-bol dans Chatweb.", "Secure Stripe payment managed by the Ar-bol shop in Chatweb.", false);
+      } else {
+        setShopMessage("La boutique est en cours d’activation.", "The shop is being activated.", true);
+      }
+      validPay();
+    }).catch(function () {
+      setShopMessage("La boutique est momentanément indisponible.", "The shop is temporarily unavailable.", true);
+    });
 
   /* ---------- Édition : jauge de rareté ---------- */
   var tally = document.getElementById("tally");
@@ -313,19 +357,18 @@
     wlForm.addEventListener("submit", function (e) {
       e.preventDefault();
       var inp = document.getElementById("wlEmail");
+      var consent = document.getElementById("wlConsent");
       var done = document.getElementById("wlDone");
       var btn = wlForm.querySelector("button[type='submit']");
       var ok = emailRe.test(inp.value.trim());
       if (!ok) { inp.focus(); inp.style.borderColor = "#b66"; return; }
+      if (!consent.checked) { consent.focus(); return; }
       inp.style.borderColor = "";
       btn.disabled = true;
       done.innerHTML = langHtml("Enregistrement…", "Saving…");
-      submitBrevoContact({
-        source: "waitlist",
-        email: inp.value.trim()
-      }).then(function () {
+      submitChatwebContact(inp.value.trim()).then(function () {
         wlForm.style.display = "none";
-        done.innerHTML = langHtml("Merci — vous êtes sur la liste.", "Thank you — you're on the list.");
+        done.innerHTML = langHtml("Merci — confirmez maintenant votre inscription par email.", "Thank you — now confirm your subscription by email.");
       }).catch(function () {
         btn.disabled = false;
         inp.focus();

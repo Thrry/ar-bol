@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ar-bol — Corbeille à fruits sculpturale</title>
 <meta name="description" content="Ar-bol, corbeille à fruits sculpturale en édition limitée à 50 exemplaires, fabriquée artisanalement dans le Finistère.">
+<meta name="chatweb-api-base" content="https://app.chatweb.app/api/v1/sites/ar-bol">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -290,7 +291,7 @@
       <aside class="reveal">
         <p class="eyebrow"><span lang="fr">Commande</span><span lang="en">Order</span></p>
         <h2 class="display"><span lang="fr">Commander un exemplaire.</span><span lang="en">Order a piece.</span></h2>
-        <div class="price">420 € <span class="price-tax">TTC</span></div>
+        <div class="price"><span id="shopPrice">420 €</span> <span class="price-tax">TTC</span></div>
         <p class="price-note"><span lang="fr">Prix de lancement · paiement en ligne</span><span lang="en">Launch price · online payment</span></p>
         <div class="reserve-stats">
           <div class="st"><b>50</b><span lang="fr">Exemplaires</span><span lang="en">Pieces</span></div>
@@ -330,10 +331,10 @@
           <div class="field"><label>Email</label><input type="email" id="email" placeholder="vous@exemple.fr" autocomplete="email"></div>
           <div class="recap">
             <div class="recap-row"><span><span lang="fr">Composition</span><span lang="en">Composition</span></span><span id="recapVar">—</span></div>
-            <div class="recap-row tot"><span><span lang="fr">Total à régler</span><span lang="en">Total due now</span></span><span>420 €</span></div>
+            <div class="recap-row tot"><span><span lang="fr">Total à régler</span><span lang="en">Total due now</span></span><span id="recapTotal">420 €</span></div>
           </div>
           <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="1"><span lang="fr">Retour</span><span lang="en">Back</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" id="pay" disabled><span lang="fr">Payer — 420 €</span><span lang="en">Pay — €420</span></button></div>
-          <p class="secure-note"><span lang="fr">Paiement sécurisé par Stripe. Vous serez redirigé vers la page de paiement test.</span><span lang="en">Secure payment by Stripe. You will be redirected to the test payment page.</span></p>
+          <p class="secure-note"><span lang="fr">Paiement sécurisé par Stripe, géré depuis la boutique Ar-bol dans Chatweb.</span><span lang="en">Secure Stripe payment managed by the Ar-bol shop in Chatweb.</span></p>
         </div>
 
         <div class="step" data-step="3">
@@ -379,11 +380,14 @@
       <h2 class="display reveal d1"><span lang="fr">Soyez prévenu·e du prochain tirage.</span><span lang="en">Be the first to know about the next release.</span></h2>
       <p class="reveal d2"><span lang="fr">La série est limitée à 50 exemplaires. Laissez votre email : vous serez informé·e en priorité des disponibilités et des prochaines éditions.</span><span lang="en">The series is limited to 50 pieces. Leave your email and you'll be the first to hear about availability and future editions.</span></p>
       <form class="wl-form reveal d2" id="wlForm" novalidate>
-        <input type="email" id="wlEmail" placeholder="vous@exemple.fr" autocomplete="email" aria-label="Email">
-        <button type="submit" class="btn btn-primary"><span lang="fr">Rejoindre</span><span lang="en">Join</span></button>
+        <div class="wl-fields">
+          <input type="email" id="wlEmail" placeholder="vous@exemple.fr" autocomplete="email" aria-label="Email">
+          <button type="submit" class="btn btn-primary"><span lang="fr">Rejoindre</span><span lang="en">Join</span></button>
+        </div>
+        <label class="wl-consent"><input type="checkbox" id="wlConsent"> <span><span lang="fr">J’accepte de recevoir par email les prochaines nouvelles d’Ar-bol.</span><span lang="en">I agree to receive Ar-bol news by email.</span></span></label>
       </form>
       <p class="wl-done reveal d3" id="wlDone"></p>
-      <p class="wl-note reveal d3"><span lang="fr">Pas de spam. Vous pouvez demander la suppression de votre email à tout moment.</span><span lang="en">No spam. You can ask to have your email removed at any time.</span></p>
+      <p class="wl-note reveal d3"><span lang="fr">Un email de confirmation vous sera envoyé. Désinscription possible à tout moment.</span><span lang="en">You will receive a confirmation email. You can unsubscribe at any time.</span></p>
     </div>
   </section>
 
