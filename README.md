@@ -61,11 +61,6 @@ ARBOL_OWNER_NAME=Kevin Guiri Couderc
 BREVO_SENDER_EMAIL=...
 BREVO_SENDER_NAME=Ar-bol
 ARBOL_ADMIN_TOKEN=...
-STRIPE_SECRET_KEY=...
-ARBOL_ORDER_BASE_COUNT=15
-ARBOL_EDITION_SIZE=50
-ARBOL_STRIPE_COUNT_SINCE=2026-07-13
-STRIPE_PAYMENT_LINK_IDS=...
 ```
 
 `BREVO_LIST_IDS` est optionnel. S'il est vide, le contact est créé ou mis à jour
@@ -99,26 +94,15 @@ serveur qui garde la clé Brevo privée.
 
 ## 2 ter. Paiement Stripe
 
-La commande est branchée en mode test avec des Stripe Payment Links publics, un
-lien par composition (`Unan`, `Daou`, `Tri`, `Pevar`). Le site tente d'abord
-d'enregistrer le contact dans Brevo, puis redirige vers Stripe ; si Brevo est
-indisponible, la redirection Stripe reste active.
+La commande lit le catalogue, le prix, les variantes, le retrait et l'état du
+paiement depuis le Shop Chatweb. Le checkout est créé par Chatweb puis ouvert
+sur Stripe.
 
-La jauge de série limitée appelle aussi `/api/order-count`. Le compteur public
-ne repart pas de zéro : il affiche `ARBOL_ORDER_BASE_COUNT` (15 par défaut) plus
-les paiements Stripe confirmés à partir de `ARBOL_STRIPE_COUNT_SINCE`.
-Configurer `STRIPE_PAYMENT_LINK_IDS` avec les IDs `plink_...` des quatre liens
-est recommandé pour éviter de compter une autre session Stripe. Si cette
-variable est vide, seules les sessions dont `client_reference_id` commence par
-`arbol_` sont comptées. Sans `STRIPE_SECRET_KEY` ou en cas d'erreur Stripe, le
-site garde le compteur manuel.
-
-Les clés secrètes Stripe ne doivent jamais être ajoutées au repo. Les liens de
-test sont dans `arbol-v2.js` car ce sont des URL publiques Stripe ; la clé
-secrète reste uniquement dans les variables serveur de l'hébergeur. Pour passer
-en production, créer les quatre Payment Links en mode live, remplacer les URL
-dans `stripeLinks`, puis mettre à jour `STRIPE_PAYMENT_LINK_IDS` avec les IDs
-live correspondants.
+La jauge de série limitée lit le stock du produit Ar-bol dans ce même Shop. Le
+produit porte le stock partagé de la première édition et les compositions
+`Unan`, `Daou`, `Tri` et `Pevar` sont ses variantes. Une commande payée
+décrémente donc le même stock, quelle que soit la composition choisie. Le site
+ne maintient plus de compteur Stripe ou de valeur manuelle en parallèle.
 
 ## 3. Structure des fichiers
 

@@ -128,9 +128,12 @@
   var variantsBySlug = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
   var apiMeta = document.querySelector('meta[name="chatweb-api-base"]');
   var chatwebApiBase = apiMeta ? apiMeta.getAttribute("content").replace(/\/$/, "") : "";
+  var chatwebProduct = null;
   var chatwebProducts = {};
+  var chatwebVariants = {};
   var chatwebShippingRule = null;
   var chatwebShopReady = false;
+  var syncEditionFromProduct = function () {};
   var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
   function langHtml(fr, en) {
     return '<span lang="fr">' + fr + '</span><span lang="en">' + en + '</span>';
@@ -157,7 +160,11 @@
     });
   }
   function currentProduct() {
-    return state.variant ? chatwebProducts[variantSlugs[state.variant]] : null;
+    if (!state.variant) return null;
+    return chatwebProduct || chatwebProducts[variantSlugs[state.variant]] || null;
+  }
+  function currentVariant() {
+    return state.variant ? chatwebVariants[variantSlugs[state.variant]] : null;
   }
   function formatMoney(amount, currency) {
     var locale = root.getAttribute("data-lang") === "en" ? "en-GB" : "fr-FR";
@@ -225,6 +232,7 @@
   payBtn.addEventListener("click", function () {
     if (payBtn.disabled) return;
     var product = currentProduct();
+    var variant = currentVariant();
     var labels = payBtn.querySelectorAll("span[lang]");
     payBtn.disabled = true;
     labels.forEach(function (s) { s.dataset.orig = s.textContent; s.textContent = s.getAttribute("lang") === "fr" ? "Ouverture Stripe…" : "Opening Stripe…"; });
@@ -233,13 +241,15 @@
         variant: state.variant
       }));
     } catch (e) {}
-    chatwebPost("/shop/checkout", {
+    var checkoutPayload = {
       "checkout[product_slug]": product.slug,
       "checkout[quantity]": "1",
       "checkout[customer_email]": email.value.trim(),
       "checkout[customer_name]": (fName.value.trim() + " " + lName.value.trim()).trim(),
       "checkout[shipping_rule_id]": String(chatwebShippingRule.id)
-    }).then(function (data) {
+    };
+    if (chatwebProduct && variant) checkoutPayload["checkout[variant_slug]"] = variant.slug;
+    chatwebPost("/shop/checkout", checkoutPayload).then(function (data) {
       if (!data.checkout_url) throw new Error("checkout_url_missing");
       window.location.href = data.checkout_url;
     }).catch(function () {
@@ -274,13 +284,28 @@
     .then(function (res) { if (!res.ok) throw new Error("shop_unavailable"); return res.json(); })
     .then(function (data) {
       var shop = data.shop || {};
-      (shop.products || []).forEach(function (product) { chatwebProducts[product.slug] = product; });
+      var products = shop.products || [];
+      chatwebProducts = {};
+      products.forEach(function (product) { chatwebProducts[product.slug] = product; });
+      chatwebProduct = products.find(function (product) { return (product.variants || []).length > 0; }) || null;
+      chatwebVariants = {};
+      ((chatwebProduct && chatwebProduct.variants) || []).forEach(function (variant) {
+        chatwebVariants[variant.slug] = variant;
+      });
+      varCards.forEach(function (card) {
+        var slug = variantSlugs[card.getAttribute("data-var")];
+        var variant = chatwebVariants[slug] || (chatwebProducts[slug] ? { slug: slug } : null);
+        card.disabled = !variant;
+        var image = card.querySelector("img");
+        if (image && variant && variant.image_url) image.src = variant.image_url;
+      });
       chatwebShippingRule = (shop.shipping_rules || [])[0] || null;
-      chatwebShopReady = !!shop.checkout_available && !!chatwebShippingRule;
-      var firstProduct = (shop.products || [])[0];
-      if (firstProduct) {
+      chatwebShopReady = !!shop.checkout_available && !!chatwebShippingRule && varCards.length > 0 && Array.prototype.some.call(varCards, function (card) { return !card.disabled; });
+      var displayProduct = chatwebProduct || products[0];
+      if (displayProduct) {
         var shopPrice = document.getElementById("shopPrice");
-        if (shopPrice) shopPrice.textContent = formatMoney(firstProduct.unit_amount, firstProduct.currency);
+        if (shopPrice) shopPrice.textContent = formatMoney(displayProduct.unit_amount, displayProduct.currency);
+        syncEditionFromProduct(displayProduct);
       }
       if (chatwebShopReady) {
         setShopMessage("Paiement sécurisé par Stripe, géré par la boutique Ar-bol dans Chatweb.", "Secure Stripe payment managed by the Ar-bol shop in Chatweb.", false);
@@ -296,7 +321,7 @@
   var tally = document.getElementById("tally");
   if (tally) {
     var editionSize = parseInt(tally.getAttribute("data-edition-size"), 10) || 50;
-    var orderedCount = parseInt(tally.getAttribute("data-ordered-count"), 10) || 15;
+    var orderedCount = parseInt(tally.getAttribute("data-ordered-count"), 10) || 0;
     var orderedLabel = document.getElementById("orderedCount");
     var availableLabel = document.getElementById("availableCount");
 
@@ -320,20 +345,21 @@
       if (tallyDone) paintTally(orderedCount);
     }
 
-    function syncEditionCount() {
-      fetch("api/order-count", { headers: { accept: "application/json" } })
-        .then(function (res) { if (!res.ok) throw new Error("order_count_failed"); return res.json(); })
-        .then(function (data) {
-          if (data && typeof data.totalOrdered === "number") setEditionCount(data.totalOrdered);
-        })
-        .catch(function () {});
-    }
+    syncEditionFromProduct = function (product) {
+      var stock = typeof product.stock_quantity === "number" ? product.stock_quantity : null;
+      var sold = typeof product.sold_quantity === "number" ? product.sold_quantity : null;
+      if (typeof product.edition_size === "number") editionSize = product.edition_size;
+      else if (stock !== null && sold !== null) editionSize = stock + sold;
+      if (stock !== null && sold === null) sold = Math.max(editionSize - stock, 0);
+      if (sold !== null) {
+        tally.setAttribute("data-edition-size", String(editionSize));
+        setEditionCount(sold);
+      }
+    };
 
     for (var ti = 0; ti < editionSize; ti++) tally.appendChild(document.createElement("i"));
     var ticks = tally.querySelectorAll("i");
     var tallyDone = false;
-    setEditionCount(orderedCount);
-    syncEditionCount();
     var fillTally = function () {
       if (tallyDone) return;
       var r = tally.getBoundingClientRect();
