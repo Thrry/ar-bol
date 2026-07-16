@@ -99,10 +99,11 @@ paiement depuis le Shop Chatweb. Le checkout est créé par Chatweb puis ouvert
 sur Stripe.
 
 La jauge de série limitée lit le stock du produit Ar-bol dans ce même Shop. Le
-produit porte le stock partagé de la première édition et les compositions
-`Unan`, `Daou`, `Tri` et `Pevar` sont ses variantes. Une commande payée
-décrémente donc le même stock, quelle que soit la composition choisie. Le site
-ne maintient plus de compteur Stripe ou de valeur manuelle en parallèle.
+produit porte le stock partagé de la première édition. Les identifiants stables
+des quatre compositions sont `unan`, `daou`, `tri` et `pevar` ; leurs noms et
+leurs images affichés viennent du Shop Chatweb. Une commande payée décrémente
+donc le même stock, quelle que soit la composition choisie. Le site ne maintient
+plus de compteur Stripe ou de valeur manuelle en parallèle.
 
 ## 3. Structure des fichiers
 

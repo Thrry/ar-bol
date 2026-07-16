@@ -124,8 +124,8 @@
 
   /* ---------- Commande / paiement ---------- */
   var state = { variant: null };
-  var variantSlugs = { Unan: "unan", Daou: "daou", Tri: "tri", Pevar: "pevar" };
-  var variantsBySlug = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
+  var variantFallbackNames = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
+  var stripeReturnSlug = null;
   var apiMeta = document.querySelector('meta[name="chatweb-api-base"]');
   var chatwebApiBase = apiMeta ? apiMeta.getAttribute("content").replace(/\/$/, "") : "";
   var chatwebProduct = null;
@@ -161,10 +161,20 @@
   }
   function currentProduct() {
     if (!state.variant) return null;
-    return chatwebProduct || chatwebProducts[variantSlugs[state.variant]] || null;
+    return chatwebProduct || chatwebProducts[state.variant] || null;
   }
   function currentVariant() {
-    return state.variant ? chatwebVariants[variantSlugs[state.variant]] : null;
+    return state.variant ? chatwebVariants[state.variant] : null;
+  }
+  function currentVariantName() {
+    var variant = currentVariant();
+    return (variant && variant.name) || variantFallbackNames[state.variant] || "—";
+  }
+  function setConfirmationVariantName(name) {
+    var confVar = document.getElementById("confVar");
+    var confVarEn = document.getElementById("confVarEn");
+    if (confVar) confVar.textContent = name;
+    if (confVarEn) confVarEn.textContent = name;
   }
   function formatMoney(amount, currency) {
     var locale = root.getAttribute("data-lang") === "en" ? "en-GB" : "fr-FR";
@@ -202,14 +212,20 @@
     card.addEventListener("click", function () {
       varCards.forEach(function (c) { c.classList.remove("sel"); });
       card.classList.add("sel");
-      state.variant = card.getAttribute("data-var");
+      state.variant = card.getAttribute("data-variant-slug");
       updateProductPrice();
       toStep2.disabled = false;
     });
   });
   function fillRecap() {
     var rv = document.getElementById("recapVar");
-    rv.innerHTML = state.variant ? '<span style="font-family:var(--serif);font-size:1.1rem">' + state.variant + "</span>" : "—";
+    rv.textContent = "";
+    if (!state.variant) { rv.textContent = "—"; return; }
+    var variantName = document.createElement("span");
+    variantName.style.fontFamily = "var(--serif)";
+    variantName.style.fontSize = "1.1rem";
+    variantName.textContent = currentVariantName();
+    rv.appendChild(variantName);
   }
   var fName = document.getElementById("fName");
   var lName = document.getElementById("lName");
@@ -238,7 +254,8 @@
     labels.forEach(function (s) { s.dataset.orig = s.textContent; s.textContent = s.getAttribute("lang") === "fr" ? "Ouverture Stripe…" : "Opening Stripe…"; });
     try {
       sessionStorage.setItem("arbolPendingOrder", JSON.stringify({
-        variant: state.variant
+        variant_slug: state.variant,
+        variant_name: currentVariantName()
       }));
     } catch (e) {}
     var checkoutPayload = {
@@ -270,11 +287,9 @@
     if (params.get("payment") !== "success") return;
     var pending = {};
     try { pending = JSON.parse(sessionStorage.getItem("arbolPendingOrder") || "{}"); } catch (e) {}
-    var variant = variantsBySlug[params.get("composition")] || pending.variant || "—";
-    var confVar = document.getElementById("confVar");
-    var confVarEn = document.getElementById("confVarEn");
-    if (confVar) confVar.textContent = variant;
-    if (confVarEn) confVarEn.textContent = variant;
+    stripeReturnSlug = params.get("composition") || pending.variant_slug || null;
+    var variantName = pending.variant_name || variantFallbackNames[stripeReturnSlug] || pending.variant || "—";
+    setConfirmationVariantName(variantName);
     try { sessionStorage.removeItem("arbolPendingOrder"); } catch (e) {}
     gotoStep(3);
     if (reserveSec) reserveSec.scrollIntoView({ block: "start" });
@@ -292,13 +307,24 @@
       ((chatwebProduct && chatwebProduct.variants) || []).forEach(function (variant) {
         chatwebVariants[variant.slug] = variant;
       });
-      varCards.forEach(function (card) {
-        var slug = variantSlugs[card.getAttribute("data-var")];
-        var variant = chatwebVariants[slug] || (chatwebProducts[slug] ? { slug: slug } : null);
-        card.disabled = !variant;
-        var image = card.querySelector("img");
-        if (image && variant && variant.image_url) image.src = variant.image_url;
+      document.querySelectorAll(".vrow-name[data-variant-slug]").forEach(function (name) {
+        var variant = chatwebVariants[name.getAttribute("data-variant-slug")];
+        if (variant && variant.name) name.textContent = variant.name;
       });
+      varCards.forEach(function (card) {
+        var slug = card.getAttribute("data-variant-slug");
+        var legacyProduct = chatwebProducts[slug];
+        var variant = chatwebVariants[slug] || (legacyProduct ? { slug: slug, name: legacyProduct.name, image_url: legacyProduct.image_url } : null);
+        card.disabled = !variant;
+        var name = card.querySelector(".nm");
+        var image = card.querySelector("img");
+        if (name && variant && variant.name) name.textContent = variant.name;
+        if (image && variant && variant.image_url) image.src = variant.image_url;
+        if (image && variant && variant.name) image.alt = variant.name;
+      });
+      if (stripeReturnSlug && chatwebVariants[stripeReturnSlug]) {
+        setConfirmationVariantName(chatwebVariants[stripeReturnSlug].name);
+      }
       chatwebShippingRule = (shop.shipping_rules || [])[0] || null;
       chatwebShopReady = !!shop.checkout_available && !!chatwebShippingRule && varCards.length > 0 && Array.prototype.some.call(varCards, function (card) { return !card.disabled; });
       var displayProduct = chatwebProduct || products[0];
