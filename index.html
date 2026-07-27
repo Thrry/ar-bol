@@ -8,6 +8,7 @@
 <meta name="chatweb-api-base" content="https://api.chatweb.app/api/v1/sites/ar-bol">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="assets/photo-hero-tableau-hd.jpg" type="image/jpeg">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="arbol-v2.css">
 </head>
@@ -45,9 +46,8 @@
   <!-- ===== HERO plein cadre ===== -->
   <section class="hero">
     <div class="hero-bg" data-par="0.18">
-      <image-slot id="v2-hero" src="assets/arbol-granite.png" shape="rect" fit="cover"
-       
-        placeholder="PROMPT IA — Corbeille a fruits sculpturale « Ar-bol » (base en bois massif tourne, deux coupes de faience) posee sur un plan de granit brut avec quelques fruits. Lumiere naturelle rasante, ambiance sombre et cinematographique, fond mineral flou. Photo produit haut de gamme, tres haute definition, cadrage plein ecran."></image-slot>
+      <image-slot id="v2-hero" src="assets/photo-hero-tableau-hd.jpg" shape="rect" fit="cover"
+        placeholder="Ar-bol devant un tableau, photographie de Kevin Guiri Couderc."></image-slot>
     </div>
     <div class="hero-veil"></div>
     <div class="hero-inner">
@@ -92,7 +92,7 @@
         <div class="vrow-media reveal">
           <span class="vrow-num">01</span>
           <div class="media" data-par="0.07"><div class="par-inner">
-            <image-slot id="v2-unan" src="assets/arbol-granite.png" shape="rect" fit="cover" placeholder="PROMPT IA — Ar-bol modele « Unan » : faience NOIRE et bois NOIR. Studio, fond sombre degrade, lumiere sculptante, packshot premium, format portrait 3:4."></image-slot>
+            <image-slot id="v2-unan" src="assets/photo-unan-noir-noir.webp" shape="rect" fit="cover" placeholder="Ar-bol Unan — faïence noire et bois noir."></image-slot>
           </div></div>
         </div>
         <div class="reveal d1">
@@ -112,7 +112,7 @@
         <div class="vrow-media reveal">
           <span class="vrow-num">02</span>
           <div class="media" data-par="0.07"><div class="par-inner">
-            <image-slot id="v2-daou" src="assets/arbol-detail.png" shape="rect" fit="cover" placeholder="PROMPT IA — Ar-bol modele « Daou » : faience NOIRE et bois CLAIR. Studio, fond sombre degrade, lumiere sculptante, packshot premium, format portrait 3:4."></image-slot>
+            <image-slot id="v2-daou" src="assets/photo-daou-noir-bois-clair.webp" shape="rect" fit="cover" placeholder="Ar-bol Daou — faïence noire et bois clair."></image-slot>
           </div></div>
         </div>
         <div class="reveal d1">
@@ -132,7 +132,7 @@
         <div class="vrow-media reveal">
           <span class="vrow-num">03</span>
           <div class="media" data-par="0.07"><div class="par-inner">
-            <image-slot id="v2-tri" src="assets/arbol-tri.png" shape="rect" fit="cover" placeholder="PROMPT IA — Ar-bol modele « Tri » : faience BLANCHE et bois CLAIR. Studio, fond sombre degrade, lumiere sculptante, packshot premium, format portrait 3:4."></image-slot>
+            <image-slot id="v2-tri" src="assets/photo-tri-blanc-bois-clair.webp" shape="rect" fit="cover" placeholder="Ar-bol Tri — faïence blanche et bois clair."></image-slot>
           </div></div>
         </div>
         <div class="reveal d1">
@@ -152,7 +152,7 @@
         <div class="vrow-media reveal">
           <span class="vrow-num">04</span>
           <div class="media" data-par="0.07"><div class="par-inner">
-            <image-slot id="v2-pevar" src="assets/arbol-white-studio.png" shape="rect" fit="cover" placeholder="PROMPT IA — Ar-bol modele « Pevar » : faience BLANCHE et bois NOIR. Studio, fond sombre degrade, lumiere sculptante, packshot premium, format portrait 3:4."></image-slot>
+            <image-slot id="v2-pevar" src="assets/photo-pevar-blanc-noir.webp" shape="rect" fit="cover" placeholder="Ar-bol Pevar — faïence blanche et bois noir."></image-slot>
           </div></div>
         </div>
         <div class="reveal d1">
@@ -314,10 +314,10 @@
         <div class="step active" data-step="1">
           <h3><span lang="fr">Choisissez votre composition</span><span lang="en">Choose your composition</span></h3>
           <div class="var-choices" id="varChoices">
-            <button type="button" class="var-card" data-variant-slug="unan"><img class="thumb" src="assets/arbol-granite.png" alt="Unan"><span><span class="nm">Unan</span><span class="ds"><span lang="fr">Faïence noire · bois noir</span><span lang="en">Black faience · black wood</span></span></span></button>
-            <button type="button" class="var-card" data-variant-slug="daou"><img class="thumb" src="assets/arbol-detail.png" alt="Daou"><span><span class="nm">Daou</span><span class="ds"><span lang="fr">Faïence noire · bois clair</span><span lang="en">Black faience · light wood</span></span></span></button>
-            <button type="button" class="var-card" data-variant-slug="tri"><img class="thumb" src="assets/arbol-tri.png" alt="Tri"><span><span class="nm">Tri</span><span class="ds"><span lang="fr">Faïence blanche · bois clair</span><span lang="en">White faience · light wood</span></span></span></button>
-            <button type="button" class="var-card" data-variant-slug="pevar"><img class="thumb" src="assets/arbol-white-studio.png" alt="Pevar"><span><span class="nm">Pevar</span><span class="ds"><span lang="fr">Faïence blanche · bois noir</span><span lang="en">White faience · black wood</span></span></span></button>
+            <button type="button" class="var-card" data-variant-slug="unan"><img class="thumb" src="assets/photo-unan-noir-noir.webp" alt="Unan"><span><span class="nm">Unan</span><span class="ds"><span lang="fr">Faïence noire · bois noir</span><span lang="en">Black faience · black wood</span></span></span></button>
+            <button type="button" class="var-card" data-variant-slug="daou"><img class="thumb" src="assets/photo-daou-noir-bois-clair.webp" alt="Daou"><span><span class="nm">Daou</span><span class="ds"><span lang="fr">Faïence noire · bois clair</span><span lang="en">Black faience · light wood</span></span></span></button>
+            <button type="button" class="var-card" data-variant-slug="tri"><img class="thumb" src="assets/photo-tri-blanc-bois-clair.webp" alt="Tri"><span><span class="nm">Tri</span><span class="ds"><span lang="fr">Faïence blanche · bois clair</span><span lang="en">White faience · light wood</span></span></span></button>
+            <button type="button" class="var-card" data-variant-slug="pevar"><img class="thumb" src="assets/photo-pevar-blanc-noir.webp" alt="Pevar"><span><span class="nm">Pevar</span><span class="ds"><span lang="fr">Faïence blanche · bois noir</span><span lang="en">White faience · black wood</span></span></span></button>
           </div>
           <div class="step-actions"><div class="spacer"></div><button type="button" class="btn btn-primary" data-next="2" disabled id="toStep2"><span lang="fr">Continuer</span><span lang="en">Continue</span></button></div>
         </div>
