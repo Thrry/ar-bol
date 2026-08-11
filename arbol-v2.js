@@ -17,6 +17,10 @@
     document.querySelectorAll("[data-setlang]").forEach(function (b) {
       b.classList.toggle("active", b.getAttribute("data-setlang") === lang);
     });
+    var decreaseLabel = document.getElementById("quantityDecrease");
+    var increaseLabel = document.getElementById("quantityIncrease");
+    if (decreaseLabel) decreaseLabel.setAttribute("aria-label", lang === "fr" ? "Réduire la quantité" : "Decrease quantity");
+    if (increaseLabel) increaseLabel.setAttribute("aria-label", lang === "fr" ? "Augmenter la quantité" : "Increase quantity");
     try { localStorage.setItem("arbol-lang", lang); } catch (e) {}
     if (state && currentProduct()) {
       updateProductPrice();
@@ -132,7 +136,7 @@
   onScroll();
 
   /* ---------- Commande / paiement ---------- */
-  var state = { variant: null, shippingRuleId: null };
+  var state = { variant: null, quantity: 1, shippingRuleId: null };
   var variantFallbackNames = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
   var variantImageSources = {
     unan: "assets/photo-unan-noir-noir.webp",
@@ -204,6 +208,12 @@
     if (amountFr) amountFr.textContent = totalFr || "—";
     if (amountEn) amountEn.textContent = totalEn || "—";
   }
+  function setConfirmationQuantity(quantity) {
+    var quantityFr = document.getElementById("confQuantity");
+    var quantityEn = document.getElementById("confQuantityEn");
+    if (quantityFr) quantityFr.textContent = String(quantity || 1);
+    if (quantityEn) quantityEn.textContent = String(quantity || 1);
+  }
   function formatMoneyForLocale(amount, currency, locale) {
     var hasCents = Math.abs(amount || 0) % 100 !== 0;
     return new Intl.NumberFormat(locale, {
@@ -218,14 +228,20 @@
   }
   function shippingAmountFor(rule, product) {
     if (!rule || !product) return null;
-    if (rule.pickup || (typeof rule.free_over_amount === "number" && product.unit_amount >= rule.free_over_amount)) return 0;
+    var subtotal = product.unit_amount * state.quantity;
+    if (rule.pickup || (typeof rule.free_over_amount === "number" && subtotal >= rule.free_over_amount)) return 0;
     return Number(rule.amount) || 0;
+  }
+  function currentSubtotalAmount() {
+    var product = currentProduct();
+    return product ? product.unit_amount * state.quantity : null;
   }
   function currentTotalAmount() {
     var product = currentProduct();
     if (!product) return null;
     var shippingAmount = shippingAmountFor(currentShippingRule(), product);
-    return shippingAmount === null ? product.unit_amount : product.unit_amount + shippingAmount;
+    var subtotal = currentSubtotalAmount();
+    return shippingAmount === null ? subtotal : subtotal + shippingAmount;
   }
   function setShopMessage(fr, en, error) {
     if (!secureNote) return;
@@ -236,9 +252,11 @@
     var product = currentProduct();
     if (!product) return;
     var price = formatMoney(product.unit_amount, product.currency);
+    var subtotalAmount = currentSubtotalAmount();
+    var subtotal = formatMoney(subtotalAmount, product.currency);
     var shippingRule = currentShippingRule();
     var shippingAmount = shippingAmountFor(shippingRule, product);
-    var totalAmount = shippingAmount === null ? product.unit_amount : product.unit_amount + shippingAmount;
+    var totalAmount = shippingAmount === null ? subtotalAmount : subtotalAmount + shippingAmount;
     var total = formatMoney(totalAmount, product.currency);
     var shopPrice = document.getElementById("shopPrice");
     var shopPayable = document.getElementById("shopPayable");
@@ -246,8 +264,8 @@
     var recapShippingPrice = document.getElementById("recapShippingPrice");
     var recapTotal = document.getElementById("recapTotal");
     if (shopPrice) shopPrice.textContent = price;
-    if (shopPayable) shopPayable.textContent = price;
-    if (recapSubtotal) recapSubtotal.textContent = price;
+    if (shopPayable) shopPayable.textContent = subtotal;
+    if (recapSubtotal) recapSubtotal.textContent = subtotal;
     if (recapShippingPrice) recapShippingPrice.textContent = shippingAmount === null ? "—" : formatMoney(shippingAmount, product.currency);
     if (recapTotal) recapTotal.textContent = shippingAmount === null ? "—" : total;
     if (payBtn) {
@@ -350,6 +368,37 @@
   }
   var varCards = document.querySelectorAll("#varChoices .var-card");
   var toStep2 = document.getElementById("toStep2");
+  var quantityInput = document.getElementById("quantity");
+  var quantityDecrease = document.getElementById("quantityDecrease");
+  var quantityIncrease = document.getElementById("quantityIncrease");
+  function setQuantity(value) {
+    var maximum = parseInt(quantityInput.max, 10) || 20;
+    var parsed = parseInt(value, 10);
+    state.quantity = Math.max(1, Math.min(Number.isFinite(parsed) ? parsed : 1, maximum));
+    quantityInput.value = String(state.quantity);
+    quantityDecrease.disabled = state.quantity <= 1;
+    quantityIncrease.disabled = state.quantity >= maximum;
+    if (chatwebShippingRules.length > 0) renderShippingChoices();
+    updateProductPrice();
+    if (payBtn) validPay();
+  }
+  function setQuantityLimit(product) {
+    var stock = Number(product && product.stock_quantity);
+    var maximum = Math.max(1, Math.min(20, Number.isFinite(stock) ? stock : 20));
+    quantityInput.max = String(maximum);
+    var helpFr = document.querySelector('#quantityHelp [lang="fr"]');
+    var helpEn = document.querySelector('#quantityHelp [lang="en"]');
+    if (helpFr) helpFr.textContent = "De 1 à " + maximum + " exemplaires par commande.";
+    if (helpEn) helpEn.textContent = "From 1 to " + maximum + " pieces per order.";
+    setQuantity(state.quantity);
+  }
+  quantityDecrease.addEventListener("click", function () { setQuantity(state.quantity - 1); });
+  quantityIncrease.addEventListener("click", function () { setQuantity(state.quantity + 1); });
+  quantityInput.addEventListener("input", function () {
+    if (quantityInput.value !== "") setQuantity(quantityInput.value);
+  });
+  quantityInput.addEventListener("change", function () { setQuantity(quantityInput.value); });
+  setQuantity(1);
   varCards.forEach(function (card) {
     card.addEventListener("click", function () {
       varCards.forEach(function (c) { c.classList.remove("sel"); });
@@ -361,6 +410,7 @@
   });
   function fillRecap() {
     var rv = document.getElementById("recapVar");
+    var recapQuantity = document.getElementById("recapQuantity");
     var shippingName = document.getElementById("recapShippingName");
     rv.textContent = "";
     if (!state.variant) { rv.textContent = "—"; return; }
@@ -369,6 +419,7 @@
     variantName.style.fontSize = "1.1rem";
     variantName.textContent = currentVariantName();
     rv.appendChild(variantName);
+    if (recapQuantity) recapQuantity.textContent = String(state.quantity);
     if (shippingName) shippingName.textContent = currentShippingRule() ? currentShippingRule().name : "—";
     updateProductPrice();
   }
@@ -380,7 +431,7 @@
   function validPay() {
     var okName = fName.value.trim().length > 0;
     var okEmail = emailRe.test(email.value.trim());
-    payBtn.disabled = !(okName && okEmail && state.variant && currentProduct() && currentShippingRule() && chatwebShopReady);
+    payBtn.disabled = !(okName && okEmail && state.variant && state.quantity >= 1 && currentProduct() && currentShippingRule() && chatwebShopReady);
   }
   [fName, lName, email].forEach(function (inp) { inp.addEventListener("input", validPay); });
 
@@ -407,6 +458,7 @@
       sessionStorage.setItem("arbolPendingOrder", JSON.stringify({
         variant_slug: state.variant,
         variant_name: currentVariantName(),
+        quantity: state.quantity,
         shipping_name: shippingRule.name,
         total_fr: formatMoneyForLocale(totalAmount, product.currency, "fr-FR"),
         total_en: formatMoneyForLocale(totalAmount, product.currency, "en-GB")
@@ -414,7 +466,7 @@
     } catch (e) {}
     var checkoutPayload = {
       "checkout[product_slug]": product.slug,
-      "checkout[quantity]": "1",
+      "checkout[quantity]": String(state.quantity),
       "checkout[customer_email]": email.value.trim(),
       "checkout[customer_name]": (fName.value.trim() + " " + lName.value.trim()).trim(),
       "checkout[shipping_rule_id]": String(shippingRule.id)
@@ -430,7 +482,7 @@
     });
   });
   document.getElementById("restart").addEventListener("click", function () {
-    state = { variant: null, shippingRuleId: null };
+    state = { variant: null, quantity: 1, shippingRuleId: null };
     varCards.forEach(function (c) { c.classList.remove("sel"); });
     if (shippingChoices) {
       shippingChoices.querySelectorAll('input[type="radio"]').forEach(function (input) { input.checked = false; });
@@ -439,6 +491,7 @@
     toStep2.disabled = true;
     if (toStep3) toStep3.disabled = true;
     payBtn.disabled = true;
+    setQuantity(1);
     fName.value = ""; lName.value = ""; email.value = "";
     gotoStep(1);
   });
@@ -450,6 +503,7 @@
     stripeReturnSlug = params.get("composition") || pending.variant_slug || null;
     var variantName = pending.variant_name || variantFallbackNames[stripeReturnSlug] || pending.variant || "—";
     setConfirmationVariantName(variantName);
+    setConfirmationQuantity(pending.quantity);
     setConfirmationDelivery(pending.shipping_name, pending.total_fr, pending.total_en);
     try { sessionStorage.removeItem("arbolPendingOrder"); } catch (e) {}
     gotoStep(4);
@@ -495,6 +549,7 @@
         var shopPayable = document.getElementById("shopPayable");
         if (shopPrice) shopPrice.textContent = formatMoney(displayProduct.unit_amount, displayProduct.currency);
         if (shopPayable) shopPayable.textContent = formatMoney(displayProduct.unit_amount, displayProduct.currency);
+        setQuantityLimit(displayProduct);
         syncEditionFromProduct(displayProduct);
       }
       if (chatwebShopReady) {

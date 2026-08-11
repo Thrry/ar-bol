@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="assets/photo-hero-tableau.webp" type="image/webp">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="arbol-v2.css?v=delivery-step">
+<link rel="stylesheet" href="arbol-v2.css?v=quantity-step">
 </head>
 <body>
 <template id="__bundler_thumbnail">
@@ -321,6 +321,17 @@
             <button type="button" class="var-card" data-variant-slug="tri"><img class="thumb" src="assets/photo-tri-blanc-bois-clair.webp" alt="Tri"><span><span class="nm">Tri</span><span class="ds"><span lang="fr">Faïence blanche · bois clair</span><span lang="en">White faience · light wood</span></span></span></button>
             <button type="button" class="var-card" data-variant-slug="pevar"><img class="thumb" src="assets/photo-pevar-blanc-noir.webp" alt="Pevar"><span><span class="nm">Pevar</span><span class="ds"><span lang="fr">Faïence blanche · bois noir</span><span lang="en">White faience · black wood</span></span></span></button>
           </div>
+          <div class="quantity-field">
+            <div>
+              <label for="quantity"><span lang="fr">Quantité</span><span lang="en">Quantity</span></label>
+              <p id="quantityHelp"><span lang="fr">De 1 à 20 exemplaires par commande.</span><span lang="en">From 1 to 20 pieces per order.</span></p>
+            </div>
+            <div class="quantity-control">
+              <button type="button" id="quantityDecrease" aria-label="Réduire la quantité">−</button>
+              <input type="number" id="quantity" value="1" min="1" max="20" step="1" inputmode="numeric" aria-describedby="quantityHelp">
+              <button type="button" id="quantityIncrease" aria-label="Augmenter la quantité">+</button>
+            </div>
+          </div>
           <div class="step-actions"><div class="spacer"></div><button type="button" class="btn btn-primary" data-next="2" disabled id="toStep2"><span lang="fr">Continuer</span><span lang="en">Continue</span></button></div>
         </div>
 
@@ -330,7 +341,7 @@
           <div class="shipping-state is-loading" id="shippingChoices" role="radiogroup" aria-labelledby="shippingTitle" aria-busy="true" aria-live="polite">
             <span lang="fr">Chargement des modes de livraison…</span><span lang="en">Loading delivery methods…</span>
           </div>
-          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="1"><span lang="fr">Retour</span><span lang="en">Back</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" data-next="3" disabled id="toStep3"><span lang="fr">Continuer</span><span lang="en">Continue</span></button></div>
+          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="1"><span lang="fr">Modifier la commande</span><span lang="en">Edit order</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" data-next="3" disabled id="toStep3"><span lang="fr">Continuer</span><span lang="en">Continue</span></button></div>
         </div>
 
         <div class="step" data-step="3">
@@ -342,19 +353,20 @@
           <div class="field"><label>Email</label><input type="email" id="email" placeholder="vous@exemple.fr" autocomplete="email"></div>
           <div class="recap">
             <div class="recap-row"><span><span lang="fr">Composition</span><span lang="en">Composition</span></span><span id="recapVar">—</span></div>
+            <div class="recap-row"><span><span lang="fr">Quantité</span><span lang="en">Quantity</span></span><span id="recapQuantity">1</span></div>
             <div class="recap-row"><span><span lang="fr">Mode de livraison</span><span lang="en">Delivery method</span></span><span id="recapShippingName">—</span></div>
             <div class="recap-row"><span><span lang="fr">Sous-total</span><span lang="en">Subtotal</span></span><span id="recapSubtotal">420 €</span></div>
             <div class="recap-row"><span><span lang="fr">Livraison</span><span lang="en">Delivery</span></span><span id="recapShippingPrice">—</span></div>
             <div class="recap-row tot"><span><span lang="fr">Total à régler</span><span lang="en">Total due now</span></span><span id="recapTotal">420 €</span></div>
           </div>
-          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="2"><span lang="fr">Retour</span><span lang="en">Back</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" id="pay" disabled><span lang="fr">Payer — 420 €</span><span lang="en">Pay — €420</span></button></div>
+          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="2"><span lang="fr">Modifier la livraison</span><span lang="en">Edit delivery</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" id="pay" disabled><span lang="fr">Payer — 420 €</span><span lang="en">Pay — €420</span></button></div>
           <p class="secure-note"><span lang="fr">Paiement sécurisé par Stripe, géré depuis la boutique Ar-bol dans Chatweb.</span><span lang="en">Secure Stripe payment managed by the Ar-bol shop in Chatweb.</span></p>
         </div>
 
         <div class="step" data-step="4">
           <div class="confirm-mark">✓</div>
           <h3><span lang="fr">Paiement confirmé</span><span lang="en">Payment confirmed</span></h3>
-          <p class="confirm-detail"><span lang="fr">Votre paiement Stripe pour Ar-bol <b id="confVar">—</b> est finalisé.</span><span lang="en">Your Stripe payment for the <b id="confVarEn">—</b> Ar-bol is complete.</span></p>
+          <p class="confirm-detail"><span lang="fr">Votre paiement Stripe pour <b id="confQuantity">1</b> × Ar-bol <b id="confVar">—</b> est finalisé.</span><span lang="en">Your Stripe payment for <b id="confQuantityEn">1</b> × <b id="confVarEn">—</b> Ar-bol is complete.</span></p>
           <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Montant réglé : <b id="confTotal">—</b> · mode choisi : <b id="confShipping">—</b>.</span><span lang="en">Amount paid: <b id="confTotalEn">—</b> · selected method: <b id="confShippingEn">—</b>.</span></p>
           <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Fabrication estimée sous 6 à 8 semaines. Ar-bol vous contactera pour organiser la remise de votre pièce.</span><span lang="en">Estimated production time is 6 to 8 weeks. Ar-bol will contact you to arrange delivery of your piece.</span></p>
           <div class="step-actions"><div class="spacer"></div><button type="button" class="btn btn-ghost" id="restart"><span lang="fr">Nouvelle commande</span><span lang="en">New order</span></button></div>
@@ -425,6 +437,6 @@
 </a>
 
 <script src="image-slot.js?v=photos-ateliers"></script>
-<script src="arbol-v2.js?v=delivery-step"></script>
+<script src="arbol-v2.js?v=quantity-step"></script>
 </body>
 </html>

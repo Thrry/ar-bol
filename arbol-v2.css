@@ -383,6 +383,24 @@ img { display:block; max-width:100%; }
 .var-card .nm { display:block; font-family: var(--serif); font-size: 1.55rem; line-height:1; }
 .var-card .ds { display:block; font-size:0.68rem; letter-spacing:0.05em; color: var(--on-night-faint); margin-top:0.3rem; }
 
+.quantity-field { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-top:1.2rem; padding-block:1rem; border-block:1px solid var(--line-d); }
+.quantity-field label { display:block; font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--on-night); }
+.quantity-field p { margin:0.15rem 0 0; color:var(--on-night-faint); font-size:0.74rem; }
+.quantity-control { display:grid; grid-template-columns:44px 64px 44px; align-items:stretch; flex:none; border:1px solid var(--line-d); border-radius:4px; overflow:hidden; }
+.quantity-control button,
+.quantity-control input { min-height:44px; border:0; background:var(--night-2); color:var(--on-night); font:inherit; text-align:center; }
+.quantity-control button { cursor:pointer; font-size:1.2rem; }
+.quantity-control button:first-child { border-inline-end:1px solid var(--line-d); }
+.quantity-control button:last-child { border-inline-start:1px solid var(--line-d); }
+.quantity-control input { width:100%; padding:0; font-variant-numeric:tabular-nums; appearance:textfield; }
+.quantity-control input::-webkit-inner-spin-button,
+.quantity-control input::-webkit-outer-spin-button { appearance:none; margin:0; }
+.quantity-control button:focus-visible,
+.quantity-control input:focus-visible { position:relative; z-index:1; outline:2px solid var(--accent); outline-offset:-2px; }
+.quantity-control button:active { transform:translateY(1px); }
+.quantity-control button:disabled { opacity:0.4; cursor:not-allowed; }
+@media (hover:hover) and (pointer:fine) { .quantity-control button:hover:not(:disabled) { background:color-mix(in srgb, var(--on-night) 8%, var(--night-2)); } }
+
 .shipping-intro { margin: -0.55rem 0 1.2rem; max-width: 52ch; color: var(--on-night-soft); }
 .shipping-state { min-height: 4.5rem; display:flex; align-items:center; border-block:1px solid var(--line-d); padding-block:1rem; color:var(--on-night-soft); }
 .shipping-state.is-loading { opacity:0.72; }
@@ -739,6 +757,8 @@ html.js .reveal.in { opacity: 1; transform: none; }
   .steps-ind .dot i { width: 28px; height: 28px; }
   .steps-ind .sep { margin-top: 14px; }
   .step h3 { font-size: 1.45rem; }
+  .quantity-field { align-items:stretch; flex-direction:column; }
+  .quantity-control { grid-template-columns:44px minmax(0, 1fr) 44px; width:100%; }
   .shipping-option {
     grid-template-columns: 22px minmax(0, 1fr);
     gap: 0.75rem;
