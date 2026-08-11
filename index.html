@@ -2,13 +2,13 @@
 <html lang="fr" data-lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ar-bol — Corbeille à fruits sculpturale</title>
 <meta name="description" content="Ar-bol, corbeille à fruits sculpturale en édition limitée à 50 exemplaires, fabriquée artisanalement dans le Finistère.">
 <meta name="chatweb-api-base" content="https://api.chatweb.app/api/v1/sites/ar-bol">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" href="assets/photo-hero-tableau-hd.jpg" type="image/jpeg">
+<link rel="preload" as="image" href="assets/photo-hero-tableau.webp" type="image/webp">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="arbol-v2.css">
 </head>
@@ -46,7 +46,7 @@
   <!-- ===== HERO plein cadre ===== -->
   <section class="hero">
     <div class="hero-bg" data-par="0.18">
-      <image-slot id="v2-hero" src="assets/photo-hero-tableau-hd.jpg" shape="rect" fit="cover"
+      <image-slot id="v2-hero" src="assets/photo-hero-tableau.webp" shape="rect" fit="cover"
         placeholder="Ar-bol devant un tableau, photographie de Kevin Guiri Couderc."></image-slot>
     </div>
     <div class="hero-veil"></div>
@@ -195,7 +195,7 @@
       </div>
       <div class="matter">
         <div class="matter-media reveal">
-          <image-slot id="maker-bois" class="ms engraving-slot" shape="rect" fit="cover" src="assets/ill-mains-tourneur-focus.png" placeholder="ILLUSTRATION — mains du tourneur en action, tour à bois, copeaux, style gravure crayon comme le cyprès"></image-slot>
+          <image-slot id="maker-bois" class="ms workshop-slot" shape="rect" fit="contain" src="assets/atelier-bois.webp" placeholder="Photographie de l’atelier de tournage sur bois."></image-slot>
         </div>
         <div class="matter-copy">
           <p class="lede reveal"><span lang="fr">Du bois massif tourné en une seule pièce à Plouhinec.</span><span lang="en">Solid wood turned in one piece in Plouhinec.</span></p>
@@ -215,7 +215,7 @@
       </div>
       <div class="matter flip">
         <div class="matter-media reveal">
-          <image-slot id="maker-faience" class="ms engraving-slot" shape="rect" fit="cover" src="assets/ill-mains-faience-focus.png?v=moule-transparent" placeholder="ILLUSTRATION — mains de la céramiste en action, coupe de faïence, atelier de Quimper, style gravure crayon comme le cyprès"></image-slot>
+          <image-slot id="maker-faience" class="ms workshop-slot" shape="rect" fit="contain" src="assets/atelier-faience.webp" placeholder="Photographie de l’atelier de faïence."></image-slot>
         </div>
         <div class="matter-copy">
           <p class="lede reveal"><span lang="fr">Deux coupes de faïence coulées en moule et émaillées à Quimper.</span><span lang="en">Two mould-cast faience bowls glazed in Quimper.</span></p>
@@ -239,8 +239,8 @@
       </p>
       <div class="tally reveal d2" id="tally" data-edition-size="50" data-ordered-count="0" aria-hidden="true"></div>
       <div class="tally-legend reveal d3">
-        <span><b id="orderedCount">—</b> <span lang="fr">commandés</span><span lang="en">ordered</span></span>
-        <span><b id="availableCount">—</b> <span lang="fr">disponibles</span><span lang="en">available</span></span>
+        <span><b id="orderedCount">0</b> <span lang="fr">commandés</span><span lang="en">ordered</span></span>
+        <span><b id="availableCount">50</b> <span lang="fr">disponibles</span><span lang="en">available</span></span>
       </div>
       <div class="edition-note reveal d3">
         <h3><span lang="fr">Première édition limitée à 50 exemplaires</span><span lang="en">First limited edition of 50 pieces</span></h3>
@@ -256,9 +256,9 @@
   <section class="section chapter" id="apropos">
     <div class="wrap designer">
       <div class="media blob reveal" data-par="0.06"><div class="par-inner">
-        <image-slot id="v2-designer" src="assets/designer.png" shape="rect" fit="cover"
+        <image-slot id="v2-designer" src="assets/designer-kevin.webp" shape="rect" fit="contain"
          
-          placeholder="PROMPT IA — Portrait du designer Kevin Guiri Couderc dans son atelier breton, lumiere naturelle douce, attitude posee et sensible, photo editoriale fond sombre, format portrait 4:5."></image-slot>
+          placeholder="Portrait de Kevin Guiri Couderc."></image-slot>
       </div></div>
       <div>
         <p class="eyebrow reveal"><span lang="fr">À propos</span><span lang="en">About</span></p>
@@ -409,7 +409,7 @@
   <span class="fc-label"><span lang="fr">Commander</span><span lang="en">Order</span></span>
 </a>
 
-<script src="image-slot.js?v=transparent-hands"></script>
-<script src="arbol-v2.js?v=chatweb-variant-names"></script>
+<script src="image-slot.js?v=photos-ateliers"></script>
+<script src="arbol-v2.js?v=mobile-photos"></script>
 </body>
 </html>

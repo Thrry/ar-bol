@@ -29,22 +29,18 @@
     reveals.forEach(function (el) { el.classList.add("in"); });
   } else {
     root.classList.add("js");
-    var pending = reveals.slice();
-    var check = function () {
-      if (!pending.length) return;
-      var vh = window.innerHeight || root.clientHeight;
-      var still = [];
-      for (var i = 0; i < pending.length; i++) {
-        var el = pending[i], r = el.getBoundingClientRect();
-        if (r.top < vh * 0.9 && r.bottom > -40) reveal(el); else still.push(el);
-      }
-      pending = still;
-    };
-    window.addEventListener("scroll", check, { passive: true });
-    window.addEventListener("resize", check);
-    window.addEventListener("load", check);
-    check();
-    setTimeout(check, 120); setTimeout(check, 450); setTimeout(check, 1000);
+    if ("IntersectionObserver" in window) {
+      var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          reveal(entry.target);
+          revealObserver.unobserve(entry.target);
+        });
+      }, { rootMargin: "0px 0px -10% 0px" });
+      reveals.forEach(function (el) { revealObserver.observe(el); });
+    } else {
+      reveals.forEach(reveal);
+    }
   }
   function reveal(el) {
     if (el.__rv) return; el.__rv = true;
@@ -59,26 +55,32 @@
   /* ---------- Trait qui se dessine ---------- */
   var rules = Array.prototype.slice.call(document.querySelectorAll("[data-draw]"));
   if (!reduce) rules.forEach(function (r) { r.style.transform = "scaleX(0)"; });
-  function drawRules() {
-    var vh = window.innerHeight;
-    rules.forEach(function (r) {
-      if (r.__drawn) return;
-      var b = r.getBoundingClientRect();
-      if (b.top < vh * 0.85) {
-        r.__drawn = true;
-        if (reduce) { r.style.transform = "none"; return; }
-        var start = null, dur = 900;
-        var step = function (ts) {
-          if (!start) start = ts;
-          var p = Math.min((ts - start) / dur, 1);
-          var e = 1 - Math.pow(1 - p, 3);
-          r.style.transform = "scaleX(" + e + ")";
-          if (p < 1) requestAnimationFrame(step); else r.style.transform = "none";
-        };
-        requestAnimationFrame(step);
-        setTimeout(function () { r.style.transform = "none"; }, dur + 400);
-      }
-    });
+  function drawRule(r) {
+    if (r.__drawn) return;
+    r.__drawn = true;
+    if (reduce) { r.style.transform = "none"; return; }
+    var start = null, dur = 900;
+    var step = function (ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var e = 1 - Math.pow(1 - p, 3);
+      r.style.transform = "scaleX(" + e + ")";
+      if (p < 1) requestAnimationFrame(step); else r.style.transform = "none";
+    };
+    requestAnimationFrame(step);
+    setTimeout(function () { r.style.transform = "none"; }, dur + 400);
+  }
+  if ("IntersectionObserver" in window) {
+    var ruleObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        drawRule(entry.target);
+        ruleObserver.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -15% 0px" });
+    rules.forEach(function (r) { ruleObserver.observe(r); });
+  } else {
+    rules.forEach(drawRule);
   }
 
   /* ---------- Scroll : progression, parallaxe, badge ---------- */
@@ -97,15 +99,18 @@
       var st = window.scrollY || window.pageYOffset;
       var vh = window.innerHeight;
       var docH = document.documentElement.scrollHeight - vh;
-      if (progress) progress.style.width = (docH > 0 ? (st / docH) * 100 : 0) + "%";
+      if (progress) progress.style.transform = "scaleX(" + (docH > 0 ? st / docH : 0) + ")";
 
-      if (!reduce) {
+      var parallaxEnabled = !reduce && window.innerWidth > 820 && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+      if (parallaxEnabled) {
         var cy = vh / 2;
         for (var i = 0; i < pars.length; i++) {
           var p = pars[i], r = p.host.getBoundingClientRect();
           var off = (r.top + r.height / 2) - cy;
           p.target.style.transform = "translate3d(0," + (-off * p.speed).toFixed(1) + "px,0)";
         }
+      } else {
+        for (var j = 0; j < pars.length; j++) pars[j].target.style.transform = "none";
       }
 
       // badge : visible après le hero, masqué quand la commande est à l'écran
@@ -117,14 +122,20 @@
       ticking = false;
     });
   }
-  window.addEventListener("scroll", function () { onScroll(); drawRules(); }, { passive: true });
+  window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", onScroll);
-  window.addEventListener("load", function () { onScroll(); drawRules(); });
-  onScroll(); drawRules();
+  window.addEventListener("load", onScroll);
+  onScroll();
 
   /* ---------- Commande / paiement ---------- */
   var state = { variant: null };
   var variantFallbackNames = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
+  var variantImageSources = {
+    unan: "assets/photo-unan-noir-noir.webp",
+    daou: "assets/photo-daou-noir-bois-clair.webp",
+    tri: "assets/photo-tri-blanc-bois-clair.webp",
+    pevar: "assets/photo-pevar-blanc-noir.webp"
+  };
   var stripeReturnSlug = null;
   var apiMeta = document.querySelector('meta[name="chatweb-api-base"]');
   var chatwebApiBase = apiMeta ? apiMeta.getAttribute("content").replace(/\/$/, "") : "";
@@ -319,7 +330,7 @@
         var name = card.querySelector(".nm");
         var image = card.querySelector("img");
         if (name && variant && variant.name) name.textContent = variant.name;
-        if (image && variant && variant.image_url) image.src = variant.image_url;
+        if (image && variantImageSources[slug]) image.src = variantImageSources[slug];
         if (image && variant && variant.name) image.alt = variant.name;
       });
       if (stripeReturnSlug && chatwebVariants[stripeReturnSlug]) {
@@ -398,9 +409,18 @@
         }
       }
     };
-    window.addEventListener("scroll", fillTally, { passive: true });
-    window.addEventListener("load", fillTally);
-    fillTally(); setTimeout(fillTally, 300); setTimeout(fillTally, 900);
+    if ("IntersectionObserver" in window) {
+      var tallyObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          fillTally();
+          tallyObserver.disconnect();
+        });
+      }, { rootMargin: "0px 0px -15% 0px" });
+      tallyObserver.observe(tally);
+    } else {
+      fillTally();
+    }
   }
 
   /* ---------- Liste d'attente ---------- */
