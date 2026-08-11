@@ -372,9 +372,11 @@ img { display:block; max-width:100%; }
 .step h3 { min-width: 0; overflow-wrap: anywhere; font-family: var(--serif); font-weight: 400; font-size: 1.7rem; margin: 0 0 1.3rem; }
 
 .var-choices { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.var-card { display:flex; align-items:center; gap:1rem; min-height: 116px; text-align:left; cursor:pointer; background:transparent; color: var(--on-night); border:1px solid var(--line-d); border-radius:4px; padding: 1rem; font: inherit; }
+.var-card { display:grid; grid-template-columns:minmax(0, 1fr) auto; align-items:center; gap:1rem; min-height: 116px; text-align:left; background:transparent; color: var(--on-night); border:1px solid var(--line-d); border-radius:4px; padding: 1rem; font: inherit; }
 .var-card:hover { border-color: var(--on-night-soft); }
 .var-card.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); }
+.var-card.is-disabled { opacity:0.45; }
+.var-card-main { display:flex; align-items:center; gap:1rem; min-width:0; }
 .var-card .duo { display:flex; }
 .var-card .thumb { width: 76px; height: auto; aspect-ratio: 3/4; border-radius: 4px; object-fit: contain; flex: none; display:block; background: #15120f; }
 .var-card .thumb-duo { border:1px solid rgba(255,255,255,0.14); }
@@ -383,12 +385,14 @@ img { display:block; max-width:100%; }
 .var-card .nm { display:block; font-family: var(--serif); font-size: 1.55rem; line-height:1; }
 .var-card .ds { display:block; font-size:0.68rem; letter-spacing:0.05em; color: var(--on-night-faint); margin-top:0.3rem; }
 
-.quantity-field { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-top:1.2rem; padding-block:1rem; border-block:1px solid var(--line-d); }
-.quantity-field label { display:block; font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--on-night); }
-.quantity-field p { margin:0.15rem 0 0; color:var(--on-night-faint); font-size:0.74rem; }
+.quantity-help { margin:1.1rem 0 0; color:var(--on-night-faint); font-size:0.74rem; }
+.quantity-help b { color:var(--on-night); font-weight:500; }
 .quantity-control { display:grid; grid-template-columns:44px 64px 44px; align-items:stretch; flex:none; border:1px solid var(--line-d); border-radius:4px; overflow:hidden; }
+.variant-quantity { grid-template-columns:36px 42px 36px; }
 .quantity-control button,
 .quantity-control input { min-height:44px; border:0; background:var(--night-2); color:var(--on-night); font:inherit; text-align:center; }
+.variant-quantity button,
+.variant-quantity input { min-height:38px; }
 .quantity-control button { cursor:pointer; font-size:1.2rem; }
 .quantity-control button:first-child { border-inline-end:1px solid var(--line-d); }
 .quantity-control button:last-child { border-inline-start:1px solid var(--line-d); }
@@ -446,6 +450,7 @@ img { display:block; max-width:100%; }
 
 .recap { border-top:1px solid var(--line-d); margin-top:1.4rem; padding-top: 1.1rem; }
 .recap-row { display:flex; justify-content:space-between; padding:0.4rem 0; color: var(--on-night-soft); }
+.recap-items { display:grid; justify-items:end; gap:0.2rem; font-family:var(--serif); font-size:1.05rem; color:var(--on-night); }
 .recap-row.tot { color: var(--on-night); font-family: var(--serif); font-size:1.2rem; border-top:1px solid var(--line-d); margin-top:0.5rem; padding-top:0.8rem; }
 
 .btn { appearance:none; cursor:pointer; font:inherit; font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; white-space:nowrap; padding: 1.05em 1.8em; border-radius:999px; border:1px solid transparent; }
@@ -757,8 +762,7 @@ html.js .reveal.in { opacity: 1; transform: none; }
   .steps-ind .dot i { width: 28px; height: 28px; }
   .steps-ind .sep { margin-top: 14px; }
   .step h3 { font-size: 1.45rem; }
-  .quantity-field { align-items:stretch; flex-direction:column; }
-  .quantity-control { grid-template-columns:44px minmax(0, 1fr) 44px; width:100%; }
+  .variant-quantity { grid-template-columns:40px 48px 40px; width:auto; }
   .shipping-option {
     grid-template-columns: 22px minmax(0, 1fr);
     gap: 0.75rem;
@@ -770,6 +774,7 @@ html.js .reveal.in { opacity: 1; transform: none; }
     padding: 0.75rem;
     gap: 0.75rem;
   }
+  .var-card-main { gap:0.75rem; }
   .var-card .thumb {
     width: 56px;
     height: auto;

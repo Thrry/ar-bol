@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="assets/photo-hero-tableau.webp" type="image/webp">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="arbol-v2.css?v=quantity-step">
+<link rel="stylesheet" href="arbol-v2.css?v=multi-quantity">
 </head>
 <body>
 <template id="__bundler_thumbnail">
@@ -314,24 +314,14 @@
         </div>
 
         <div class="step active" data-step="1">
-          <h3><span lang="fr">Choisissez votre composition</span><span lang="en">Choose your composition</span></h3>
+          <h3><span lang="fr">Choisissez vos compositions</span><span lang="en">Choose your compositions</span></h3>
           <div class="var-choices" id="varChoices">
-            <button type="button" class="var-card" data-variant-slug="unan"><img class="thumb" src="assets/photo-unan-noir-noir.webp" alt="Unan"><span><span class="nm">Unan</span><span class="ds"><span lang="fr">Faïence noire · bois noir</span><span lang="en">Black faience · black wood</span></span></span></button>
-            <button type="button" class="var-card" data-variant-slug="daou"><img class="thumb" src="assets/photo-daou-noir-bois-clair.webp" alt="Daou"><span><span class="nm">Daou</span><span class="ds"><span lang="fr">Faïence noire · bois clair</span><span lang="en">Black faience · light wood</span></span></span></button>
-            <button type="button" class="var-card" data-variant-slug="tri"><img class="thumb" src="assets/photo-tri-blanc-bois-clair.webp" alt="Tri"><span><span class="nm">Tri</span><span class="ds"><span lang="fr">Faïence blanche · bois clair</span><span lang="en">White faience · light wood</span></span></span></button>
-            <button type="button" class="var-card" data-variant-slug="pevar"><img class="thumb" src="assets/photo-pevar-blanc-noir.webp" alt="Pevar"><span><span class="nm">Pevar</span><span class="ds"><span lang="fr">Faïence blanche · bois noir</span><span lang="en">White faience · black wood</span></span></span></button>
+            <article class="var-card" data-variant-slug="unan"><div class="var-card-main"><img class="thumb" src="assets/photo-unan-noir-noir.webp" alt="Unan"><span><span class="nm">Unan</span><span class="ds"><span lang="fr">Faïence noire · bois noir</span><span lang="en">Black faience · black wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Unan">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Unan"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Unan">+</button></div></article>
+            <article class="var-card" data-variant-slug="daou"><div class="var-card-main"><img class="thumb" src="assets/photo-daou-noir-bois-clair.webp" alt="Daou"><span><span class="nm">Daou</span><span class="ds"><span lang="fr">Faïence noire · bois clair</span><span lang="en">Black faience · light wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Daou">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Daou"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Daou">+</button></div></article>
+            <article class="var-card" data-variant-slug="tri"><div class="var-card-main"><img class="thumb" src="assets/photo-tri-blanc-bois-clair.webp" alt="Tri"><span><span class="nm">Tri</span><span class="ds"><span lang="fr">Faïence blanche · bois clair</span><span lang="en">White faience · light wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Tri">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Tri"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Tri">+</button></div></article>
+            <article class="var-card" data-variant-slug="pevar"><div class="var-card-main"><img class="thumb" src="assets/photo-pevar-blanc-noir.webp" alt="Pevar"><span><span class="nm">Pevar</span><span class="ds"><span lang="fr">Faïence blanche · bois noir</span><span lang="en">White faience · black wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Pevar">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Pevar"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Pevar">+</button></div></article>
           </div>
-          <div class="quantity-field">
-            <div>
-              <label for="quantity"><span lang="fr">Quantité</span><span lang="en">Quantity</span></label>
-              <p id="quantityHelp"><span lang="fr">De 1 à 20 exemplaires par commande.</span><span lang="en">From 1 to 20 pieces per order.</span></p>
-            </div>
-            <div class="quantity-control">
-              <button type="button" id="quantityDecrease" aria-label="Réduire la quantité">−</button>
-              <input type="number" id="quantity" value="1" min="1" max="20" step="1" inputmode="numeric" aria-describedby="quantityHelp">
-              <button type="button" id="quantityIncrease" aria-label="Augmenter la quantité">+</button>
-            </div>
-          </div>
+          <p class="quantity-help" id="quantityHelp"><span lang="fr">Choisissez la quantité de chaque modèle — <b id="basketTotal">0</b> sur 20 exemplaires.</span><span lang="en">Choose a quantity for each model — <b id="basketTotalEn">0</b> of 20 pieces.</span></p>
           <div class="step-actions"><div class="spacer"></div><button type="button" class="btn btn-primary" data-next="2" disabled id="toStep2"><span lang="fr">Continuer</span><span lang="en">Continue</span></button></div>
         </div>
 
@@ -352,8 +342,7 @@
           </div>
           <div class="field"><label>Email</label><input type="email" id="email" placeholder="vous@exemple.fr" autocomplete="email"></div>
           <div class="recap">
-            <div class="recap-row"><span><span lang="fr">Composition</span><span lang="en">Composition</span></span><span id="recapVar">—</span></div>
-            <div class="recap-row"><span><span lang="fr">Quantité</span><span lang="en">Quantity</span></span><span id="recapQuantity">1</span></div>
+            <div class="recap-row"><span><span lang="fr">Compositions</span><span lang="en">Compositions</span></span><span class="recap-items" id="recapVar">—</span></div>
             <div class="recap-row"><span><span lang="fr">Mode de livraison</span><span lang="en">Delivery method</span></span><span id="recapShippingName">—</span></div>
             <div class="recap-row"><span><span lang="fr">Sous-total</span><span lang="en">Subtotal</span></span><span id="recapSubtotal">420 €</span></div>
             <div class="recap-row"><span><span lang="fr">Livraison</span><span lang="en">Delivery</span></span><span id="recapShippingPrice">—</span></div>
@@ -366,7 +355,7 @@
         <div class="step" data-step="4">
           <div class="confirm-mark">✓</div>
           <h3><span lang="fr">Paiement confirmé</span><span lang="en">Payment confirmed</span></h3>
-          <p class="confirm-detail"><span lang="fr">Votre paiement Stripe pour <b id="confQuantity">1</b> × Ar-bol <b id="confVar">—</b> est finalisé.</span><span lang="en">Your Stripe payment for <b id="confQuantityEn">1</b> × <b id="confVarEn">—</b> Ar-bol is complete.</span></p>
+          <p class="confirm-detail"><span lang="fr">Votre paiement Stripe pour <b id="confSummary">votre commande Ar-bol</b> est finalisé.</span><span lang="en">Your Stripe payment for <b id="confSummaryEn">your Ar-bol order</b> is complete.</span></p>
           <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Montant réglé : <b id="confTotal">—</b> · mode choisi : <b id="confShipping">—</b>.</span><span lang="en">Amount paid: <b id="confTotalEn">—</b> · selected method: <b id="confShippingEn">—</b>.</span></p>
           <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Fabrication estimée sous 6 à 8 semaines. Ar-bol vous contactera pour organiser la remise de votre pièce.</span><span lang="en">Estimated production time is 6 to 8 weeks. Ar-bol will contact you to arrange delivery of your piece.</span></p>
           <div class="step-actions"><div class="spacer"></div><button type="button" class="btn btn-ghost" id="restart"><span lang="fr">Nouvelle commande</span><span lang="en">New order</span></button></div>
@@ -437,6 +426,6 @@
 </a>
 
 <script src="image-slot.js?v=photos-ateliers"></script>
-<script src="arbol-v2.js?v=quantity-step"></script>
+<script src="arbol-v2.js?v=multi-quantity"></script>
 </body>
 </html>

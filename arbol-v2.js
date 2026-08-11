@@ -17,10 +17,15 @@
     document.querySelectorAll("[data-setlang]").forEach(function (b) {
       b.classList.toggle("active", b.getAttribute("data-setlang") === lang);
     });
-    var decreaseLabel = document.getElementById("quantityDecrease");
-    var increaseLabel = document.getElementById("quantityIncrease");
-    if (decreaseLabel) decreaseLabel.setAttribute("aria-label", lang === "fr" ? "Réduire la quantité" : "Decrease quantity");
-    if (increaseLabel) increaseLabel.setAttribute("aria-label", lang === "fr" ? "Augmenter la quantité" : "Increase quantity");
+    document.querySelectorAll("#varChoices .var-card").forEach(function (card) {
+      var name = (card.querySelector(".nm") || {}).textContent || card.getAttribute("data-variant-slug");
+      var decrease = card.querySelector("[data-quantity-decrease]");
+      var increase = card.querySelector("[data-quantity-increase]");
+      var input = card.querySelector("[data-quantity]");
+      if (decrease) decrease.setAttribute("aria-label", (lang === "fr" ? "Réduire la quantité de " : "Decrease quantity of ") + name);
+      if (increase) increase.setAttribute("aria-label", (lang === "fr" ? "Augmenter la quantité de " : "Increase quantity of ") + name);
+      if (input) input.setAttribute("aria-label", (lang === "fr" ? "Quantité de " : "Quantity of ") + name);
+    });
     try { localStorage.setItem("arbol-lang", lang); } catch (e) {}
     if (state && currentProduct()) {
       updateProductPrice();
@@ -136,7 +141,8 @@
   onScroll();
 
   /* ---------- Commande / paiement ---------- */
-  var state = { variant: null, quantity: 1, shippingRuleId: null };
+  var state = { quantities: { unan: 0, daou: 0, tri: 0, pevar: 0 }, shippingRuleId: null };
+  var maximumTotalQuantity = 20;
   var variantFallbackNames = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
   var variantImageSources = {
     unan: "assets/photo-unan-noir-noir.webp",
@@ -179,24 +185,35 @@
     });
   }
   function currentProduct() {
-    if (!state.variant) return null;
-    return chatwebProduct || chatwebProducts[state.variant] || null;
+    if (chatwebProduct) return chatwebProduct;
+    var selected = selectedItems()[0];
+    return selected ? chatwebProducts[selected.slug] || null : null;
   }
-  function currentVariant() {
-    return state.variant ? chatwebVariants[state.variant] : null;
+  function totalQuantity() {
+    return Object.keys(state.quantities).reduce(function (sum, slug) { return sum + (state.quantities[slug] || 0); }, 0);
   }
-  function currentVariantName() {
-    var variant = currentVariant();
-    return (variant && variant.name) || variantFallbackNames[state.variant] || "—";
+  function selectedItems() {
+    return Object.keys(state.quantities).filter(function (slug) { return state.quantities[slug] > 0; }).map(function (slug) {
+      var variant = chatwebVariants[slug];
+      return {
+        slug: slug,
+        name: (variant && variant.name) || variantFallbackNames[slug] || slug,
+        quantity: state.quantities[slug]
+      };
+    });
   }
   function currentShippingRule() {
     return chatwebShippingRules.find(function (rule) { return String(rule.id) === String(state.shippingRuleId); }) || null;
   }
-  function setConfirmationVariantName(name) {
-    var confVar = document.getElementById("confVar");
-    var confVarEn = document.getElementById("confVarEn");
-    if (confVar) confVar.textContent = name;
-    if (confVarEn) confVarEn.textContent = name;
+  function orderSummary(items) {
+    return (items || []).map(function (item) { return item.quantity + " × " + item.name; }).join(", ") || "—";
+  }
+  function setConfirmationSummary(items, fallbackName, fallbackQuantity) {
+    var summary = orderSummary(items && items.length ? items : [ { name: fallbackName || "Ar-bol", quantity: fallbackQuantity || 1 } ]);
+    var confSummary = document.getElementById("confSummary");
+    var confSummaryEn = document.getElementById("confSummaryEn");
+    if (confSummary) confSummary.textContent = summary;
+    if (confSummaryEn) confSummaryEn.textContent = summary;
   }
   function setConfirmationDelivery(name, totalFr, totalEn) {
     var shippingFr = document.getElementById("confShipping");
@@ -207,12 +224,6 @@
     if (shippingEn) shippingEn.textContent = name || "—";
     if (amountFr) amountFr.textContent = totalFr || "—";
     if (amountEn) amountEn.textContent = totalEn || "—";
-  }
-  function setConfirmationQuantity(quantity) {
-    var quantityFr = document.getElementById("confQuantity");
-    var quantityEn = document.getElementById("confQuantityEn");
-    if (quantityFr) quantityFr.textContent = String(quantity || 1);
-    if (quantityEn) quantityEn.textContent = String(quantity || 1);
   }
   function formatMoneyForLocale(amount, currency, locale) {
     var hasCents = Math.abs(amount || 0) % 100 !== 0;
@@ -228,13 +239,13 @@
   }
   function shippingAmountFor(rule, product) {
     if (!rule || !product) return null;
-    var subtotal = product.unit_amount * state.quantity;
+    var subtotal = product.unit_amount * totalQuantity();
     if (rule.pickup || (typeof rule.free_over_amount === "number" && subtotal >= rule.free_over_amount)) return 0;
     return Number(rule.amount) || 0;
   }
   function currentSubtotalAmount() {
     var product = currentProduct();
-    return product ? product.unit_amount * state.quantity : null;
+    return product ? product.unit_amount * totalQuantity() : null;
   }
   function currentTotalAmount() {
     var product = currentProduct();
@@ -368,58 +379,74 @@
   }
   var varCards = document.querySelectorAll("#varChoices .var-card");
   var toStep2 = document.getElementById("toStep2");
-  var quantityInput = document.getElementById("quantity");
-  var quantityDecrease = document.getElementById("quantityDecrease");
-  var quantityIncrease = document.getElementById("quantityIncrease");
-  function setQuantity(value) {
-    var maximum = parseInt(quantityInput.max, 10) || 20;
+  function syncQuantityControls() {
+    var total = totalQuantity();
+    var basketTotal = document.getElementById("basketTotal");
+    var basketTotalEn = document.getElementById("basketTotalEn");
+    if (basketTotal) basketTotal.textContent = String(total);
+    if (basketTotalEn) basketTotalEn.textContent = String(total);
+    varCards.forEach(function (card) {
+      var slug = card.getAttribute("data-variant-slug");
+      var available = card.getAttribute("data-available") !== "false";
+      var quantity = state.quantities[slug] || 0;
+      var input = card.querySelector("[data-quantity]");
+      var decrease = card.querySelector("[data-quantity-decrease]");
+      var increase = card.querySelector("[data-quantity-increase]");
+      input.value = String(quantity);
+      input.max = String(quantity + Math.max(0, maximumTotalQuantity - total));
+      input.disabled = !available;
+      decrease.disabled = !available || quantity <= 0;
+      increase.disabled = !available || total >= maximumTotalQuantity;
+      card.classList.toggle("sel", quantity > 0);
+      card.classList.toggle("is-disabled", !available);
+    });
+    toStep2.disabled = total < 1 || !currentProduct();
+  }
+  function setVariantQuantity(slug, value) {
+    var current = state.quantities[slug] || 0;
     var parsed = parseInt(value, 10);
-    state.quantity = Math.max(1, Math.min(Number.isFinite(parsed) ? parsed : 1, maximum));
-    quantityInput.value = String(state.quantity);
-    quantityDecrease.disabled = state.quantity <= 1;
-    quantityIncrease.disabled = state.quantity >= maximum;
+    var allowed = current + Math.max(0, maximumTotalQuantity - totalQuantity());
+    state.quantities[slug] = Math.max(0, Math.min(Number.isFinite(parsed) ? parsed : 0, allowed));
+    syncQuantityControls();
     if (chatwebShippingRules.length > 0) renderShippingChoices();
     updateProductPrice();
     if (payBtn) validPay();
   }
   function setQuantityLimit(product) {
     var stock = Number(product && product.stock_quantity);
-    var maximum = Math.max(1, Math.min(20, Number.isFinite(stock) ? stock : 20));
-    quantityInput.max = String(maximum);
+    maximumTotalQuantity = Math.max(1, Math.min(20, Number.isFinite(stock) ? stock : 20));
+    var runningTotal = 0;
+    Object.keys(state.quantities).forEach(function (slug) {
+      state.quantities[slug] = Math.min(state.quantities[slug], Math.max(0, maximumTotalQuantity - runningTotal));
+      runningTotal += state.quantities[slug];
+    });
     var helpFr = document.querySelector('#quantityHelp [lang="fr"]');
     var helpEn = document.querySelector('#quantityHelp [lang="en"]');
-    if (helpFr) helpFr.textContent = "De 1 à " + maximum + " exemplaires par commande.";
-    if (helpEn) helpEn.textContent = "From 1 to " + maximum + " pieces per order.";
-    setQuantity(state.quantity);
+    if (helpFr) helpFr.innerHTML = 'Choisissez la quantité de chaque modèle — <b id="basketTotal">' + totalQuantity() + '</b> sur ' + maximumTotalQuantity + ' exemplaires.';
+    if (helpEn) helpEn.innerHTML = 'Choose a quantity for each model — <b id="basketTotalEn">' + totalQuantity() + '</b> of ' + maximumTotalQuantity + ' pieces.';
+    syncQuantityControls();
   }
-  quantityDecrease.addEventListener("click", function () { setQuantity(state.quantity - 1); });
-  quantityIncrease.addEventListener("click", function () { setQuantity(state.quantity + 1); });
-  quantityInput.addEventListener("input", function () {
-    if (quantityInput.value !== "") setQuantity(quantityInput.value);
-  });
-  quantityInput.addEventListener("change", function () { setQuantity(quantityInput.value); });
-  setQuantity(1);
   varCards.forEach(function (card) {
-    card.addEventListener("click", function () {
-      varCards.forEach(function (c) { c.classList.remove("sel"); });
-      card.classList.add("sel");
-      state.variant = card.getAttribute("data-variant-slug");
-      updateProductPrice();
-      toStep2.disabled = false;
+    var slug = card.getAttribute("data-variant-slug");
+    var input = card.querySelector("[data-quantity]");
+    card.querySelector("[data-quantity-decrease]").addEventListener("click", function () { setVariantQuantity(slug, (state.quantities[slug] || 0) - 1); });
+    card.querySelector("[data-quantity-increase]").addEventListener("click", function () { setVariantQuantity(slug, (state.quantities[slug] || 0) + 1); });
+    input.addEventListener("input", function () {
+      if (input.value !== "") setVariantQuantity(slug, input.value);
     });
+    input.addEventListener("change", function () { setVariantQuantity(slug, input.value); });
   });
+  syncQuantityControls();
   function fillRecap() {
     var rv = document.getElementById("recapVar");
-    var recapQuantity = document.getElementById("recapQuantity");
     var shippingName = document.getElementById("recapShippingName");
     rv.textContent = "";
-    if (!state.variant) { rv.textContent = "—"; return; }
-    var variantName = document.createElement("span");
-    variantName.style.fontFamily = "var(--serif)";
-    variantName.style.fontSize = "1.1rem";
-    variantName.textContent = currentVariantName();
-    rv.appendChild(variantName);
-    if (recapQuantity) recapQuantity.textContent = String(state.quantity);
+    selectedItems().forEach(function (item) {
+      var line = document.createElement("span");
+      line.textContent = item.quantity + " × " + item.name;
+      rv.appendChild(line);
+    });
+    if (!rv.children.length) rv.textContent = "—";
     if (shippingName) shippingName.textContent = currentShippingRule() ? currentShippingRule().name : "—";
     updateProductPrice();
   }
@@ -431,7 +458,7 @@
   function validPay() {
     var okName = fName.value.trim().length > 0;
     var okEmail = emailRe.test(email.value.trim());
-    payBtn.disabled = !(okName && okEmail && state.variant && state.quantity >= 1 && currentProduct() && currentShippingRule() && chatwebShopReady);
+    payBtn.disabled = !(okName && okEmail && totalQuantity() >= 1 && currentProduct() && currentShippingRule() && chatwebShopReady);
   }
   [fName, lName, email].forEach(function (inp) { inp.addEventListener("input", validPay); });
 
@@ -448,7 +475,7 @@
   payBtn.addEventListener("click", function () {
     if (payBtn.disabled) return;
     var product = currentProduct();
-    var variant = currentVariant();
+    var items = selectedItems();
     var shippingRule = currentShippingRule();
     var totalAmount = currentTotalAmount();
     var labels = payBtn.querySelectorAll("span[lang]");
@@ -456,9 +483,7 @@
     labels.forEach(function (s) { s.dataset.orig = s.textContent; s.textContent = s.getAttribute("lang") === "fr" ? "Ouverture Stripe…" : "Opening Stripe…"; });
     try {
       sessionStorage.setItem("arbolPendingOrder", JSON.stringify({
-        variant_slug: state.variant,
-        variant_name: currentVariantName(),
-        quantity: state.quantity,
+        items: items,
         shipping_name: shippingRule.name,
         total_fr: formatMoneyForLocale(totalAmount, product.currency, "fr-FR"),
         total_en: formatMoneyForLocale(totalAmount, product.currency, "en-GB")
@@ -466,12 +491,14 @@
     } catch (e) {}
     var checkoutPayload = {
       "checkout[product_slug]": product.slug,
-      "checkout[quantity]": String(state.quantity),
       "checkout[customer_email]": email.value.trim(),
       "checkout[customer_name]": (fName.value.trim() + " " + lName.value.trim()).trim(),
       "checkout[shipping_rule_id]": String(shippingRule.id)
     };
-    if (chatwebProduct && variant) checkoutPayload["checkout[variant_slug]"] = variant.slug;
+    items.forEach(function (item, index) {
+      checkoutPayload["checkout[items][" + index + "][variant_slug]"] = item.slug;
+      checkoutPayload["checkout[items][" + index + "][quantity]"] = String(item.quantity);
+    });
     chatwebPost("/shop/checkout", checkoutPayload).then(function (data) {
       if (!data.checkout_url) throw new Error("checkout_url_missing");
       window.location.href = data.checkout_url;
@@ -482,8 +509,7 @@
     });
   });
   document.getElementById("restart").addEventListener("click", function () {
-    state = { variant: null, quantity: 1, shippingRuleId: null };
-    varCards.forEach(function (c) { c.classList.remove("sel"); });
+    state = { quantities: { unan: 0, daou: 0, tri: 0, pevar: 0 }, shippingRuleId: null };
     if (shippingChoices) {
       shippingChoices.querySelectorAll('input[type="radio"]').forEach(function (input) { input.checked = false; });
       shippingChoices.querySelectorAll(".shipping-option").forEach(function (option) { option.classList.remove("sel"); });
@@ -491,7 +517,8 @@
     toStep2.disabled = true;
     if (toStep3) toStep3.disabled = true;
     payBtn.disabled = true;
-    setQuantity(1);
+    syncQuantityControls();
+    updateProductPrice();
     fName.value = ""; lName.value = ""; email.value = "";
     gotoStep(1);
   });
@@ -502,8 +529,7 @@
     try { pending = JSON.parse(sessionStorage.getItem("arbolPendingOrder") || "{}"); } catch (e) {}
     stripeReturnSlug = params.get("composition") || pending.variant_slug || null;
     var variantName = pending.variant_name || variantFallbackNames[stripeReturnSlug] || pending.variant || "—";
-    setConfirmationVariantName(variantName);
-    setConfirmationQuantity(pending.quantity);
+    setConfirmationSummary(pending.items, variantName, pending.quantity);
     setConfirmationDelivery(pending.shipping_name, pending.total_fr, pending.total_en);
     try { sessionStorage.removeItem("arbolPendingOrder"); } catch (e) {}
     gotoStep(4);
@@ -530,19 +556,16 @@
         var slug = card.getAttribute("data-variant-slug");
         var legacyProduct = chatwebProducts[slug];
         var variant = chatwebVariants[slug] || (legacyProduct ? { slug: slug, name: legacyProduct.name, image_url: legacyProduct.image_url } : null);
-        card.disabled = !variant;
+        card.setAttribute("data-available", variant ? "true" : "false");
         var name = card.querySelector(".nm");
         var image = card.querySelector("img");
         if (name && variant && variant.name) name.textContent = variant.name;
         if (image && variantImageSources[slug]) image.src = variantImageSources[slug];
         if (image && variant && variant.name) image.alt = variant.name;
       });
-      if (stripeReturnSlug && chatwebVariants[stripeReturnSlug]) {
-        setConfirmationVariantName(chatwebVariants[stripeReturnSlug].name);
-      }
       chatwebShippingRules = shop.shipping_rules || [];
       renderShippingChoices();
-      chatwebShopReady = !!shop.checkout_available && chatwebShippingRules.length > 0 && varCards.length > 0 && Array.prototype.some.call(varCards, function (card) { return !card.disabled; });
+      chatwebShopReady = !!shop.checkout_available && chatwebShippingRules.length > 0 && varCards.length > 0 && Array.prototype.some.call(varCards, function (card) { return card.getAttribute("data-available") === "true"; });
       var displayProduct = chatwebProduct || products[0];
       if (displayProduct) {
         var shopPrice = document.getElementById("shopPrice");
@@ -552,6 +575,7 @@
         setQuantityLimit(displayProduct);
         syncEditionFromProduct(displayProduct);
       }
+      syncQuantityControls();
       if (chatwebShopReady) {
         setShopMessage("Paiement sécurisé par Stripe, géré par la boutique Ar-bol dans Chatweb.", "Secure Stripe payment managed by the Ar-bol shop in Chatweb.", false);
       } else {
