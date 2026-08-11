@@ -1,0 +1,9 @@
+{
+  "scanned_at": "2026-08-11",
+  "framework": "vanilla HTML, CSS and JavaScript",
+  "fonts": ["Cormorant Garamond", "Hanken Grotesk"],
+  "palette": "existing warm paper and night tokens in arbol-v2.css",
+  "motion": "custom CSS and JavaScript with reduced-motion support",
+  "spacing": "existing fluid clamp-based scale",
+  "preserve": ["font stack", "palette", "checkout panel structure", "bilingual content"]
+}

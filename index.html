@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="assets/photo-hero-tableau.webp" type="image/webp">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="arbol-v2.css">
+<link rel="stylesheet" href="arbol-v2.css?v=delivery-step">
 </head>
 <body>
 <template id="__bundler_thumbnail">
@@ -297,7 +297,7 @@
           <div class="st"><b>50</b><span lang="fr">Exemplaires</span><span lang="en">Pieces</span></div>
           <div class="st"><b>6–8</b><span lang="fr">Semaines</span><span lang="en">Weeks</span></div>
           <div class="st"><b>100 %</b><span lang="fr">Paiement direct</span><span lang="en">Direct payment</span></div>
-          <div class="st"><b>420 €</b><span lang="fr">À régler</span><span lang="en">To pay</span></div>
+          <div class="st"><b id="shopPayable">420 €</b><span lang="fr">Hors livraison</span><span lang="en">Before delivery</span></div>
         </div>
         <p class="launch-note"><span lang="fr">Ce tarif correspond au prix de lancement de cette première édition limitée. Le paiement valide directement la commande de la composition choisie.</span><span lang="en">This launch price applies to the first limited edition. Payment directly confirms the order for the selected composition.</span></p>
       </aside>
@@ -306,9 +306,11 @@
         <div class="steps-ind" id="stepsInd">
           <div class="dot active" data-step="1"><i>1</i><span lang="fr">Composition</span><span lang="en">Composition</span></div>
           <div class="sep"></div>
-          <div class="dot" data-step="2"><i>2</i><span lang="fr">Paiement</span><span lang="en">Payment</span></div>
+          <div class="dot" data-step="2"><i>2</i><span lang="fr">Livraison</span><span lang="en">Delivery</span></div>
           <div class="sep"></div>
-          <div class="dot" data-step="3"><i>3</i><span lang="fr">Confirmation</span><span lang="en">Confirmation</span></div>
+          <div class="dot" data-step="3"><i>3</i><span lang="fr">Paiement</span><span lang="en">Payment</span></div>
+          <div class="sep"></div>
+          <div class="dot" data-step="4"><i>4</i><span lang="fr">Confirmation</span><span lang="en">Confirmation</span></div>
         </div>
 
         <div class="step active" data-step="1">
@@ -323,6 +325,15 @@
         </div>
 
         <div class="step" data-step="2">
+          <h3 id="shippingTitle"><span lang="fr">Choisissez votre mode de livraison</span><span lang="en">Choose your delivery method</span></h3>
+          <p class="shipping-intro"><span lang="fr">Les options disponibles et leurs tarifs sont synchronisés avec la boutique Ar-bol.</span><span lang="en">Available options and prices are synced with the Ar-bol shop.</span></p>
+          <div class="shipping-state is-loading" id="shippingChoices" role="radiogroup" aria-labelledby="shippingTitle" aria-busy="true" aria-live="polite">
+            <span lang="fr">Chargement des modes de livraison…</span><span lang="en">Loading delivery methods…</span>
+          </div>
+          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="1"><span lang="fr">Retour</span><span lang="en">Back</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" data-next="3" disabled id="toStep3"><span lang="fr">Continuer</span><span lang="en">Continue</span></button></div>
+        </div>
+
+        <div class="step" data-step="3">
           <h3><span lang="fr">Vos coordonnées & paiement</span><span lang="en">Your details & payment</span></h3>
           <div class="field row">
             <div><label><span lang="fr">Prénom</span><span lang="en">First name</span></label><input type="text" id="fName" autocomplete="given-name"></div>
@@ -331,17 +342,21 @@
           <div class="field"><label>Email</label><input type="email" id="email" placeholder="vous@exemple.fr" autocomplete="email"></div>
           <div class="recap">
             <div class="recap-row"><span><span lang="fr">Composition</span><span lang="en">Composition</span></span><span id="recapVar">—</span></div>
+            <div class="recap-row"><span><span lang="fr">Mode de livraison</span><span lang="en">Delivery method</span></span><span id="recapShippingName">—</span></div>
+            <div class="recap-row"><span><span lang="fr">Sous-total</span><span lang="en">Subtotal</span></span><span id="recapSubtotal">420 €</span></div>
+            <div class="recap-row"><span><span lang="fr">Livraison</span><span lang="en">Delivery</span></span><span id="recapShippingPrice">—</span></div>
             <div class="recap-row tot"><span><span lang="fr">Total à régler</span><span lang="en">Total due now</span></span><span id="recapTotal">420 €</span></div>
           </div>
-          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="1"><span lang="fr">Retour</span><span lang="en">Back</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" id="pay" disabled><span lang="fr">Payer — 420 €</span><span lang="en">Pay — €420</span></button></div>
+          <div class="step-actions"><button type="button" class="btn btn-ghost" data-prev="2"><span lang="fr">Retour</span><span lang="en">Back</span></button><div class="spacer"></div><button type="button" class="btn btn-primary" id="pay" disabled><span lang="fr">Payer — 420 €</span><span lang="en">Pay — €420</span></button></div>
           <p class="secure-note"><span lang="fr">Paiement sécurisé par Stripe, géré depuis la boutique Ar-bol dans Chatweb.</span><span lang="en">Secure Stripe payment managed by the Ar-bol shop in Chatweb.</span></p>
         </div>
 
-        <div class="step" data-step="3">
+        <div class="step" data-step="4">
           <div class="confirm-mark">✓</div>
           <h3><span lang="fr">Paiement confirmé</span><span lang="en">Payment confirmed</span></h3>
           <p class="confirm-detail"><span lang="fr">Votre paiement Stripe pour Ar-bol <b id="confVar">—</b> est finalisé.</span><span lang="en">Your Stripe payment for the <b id="confVarEn">—</b> Ar-bol is complete.</span></p>
-          <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Montant réglé : <b>420 €</b> · fabrication estimée sous 6 à 8 semaines, puis retrait convenu avec Ar-bol.</span><span lang="en">Amount paid: <b>€420</b> · estimated production within 6 to 8 weeks, followed by collection arranged with Ar-bol.</span></p>
+          <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Montant réglé : <b id="confTotal">—</b> · mode choisi : <b id="confShipping">—</b>.</span><span lang="en">Amount paid: <b id="confTotalEn">—</b> · selected method: <b id="confShippingEn">—</b>.</span></p>
+          <p class="confirm-detail" style="margin-top:1rem"><span lang="fr">Fabrication estimée sous 6 à 8 semaines. Ar-bol vous contactera pour organiser la remise de votre pièce.</span><span lang="en">Estimated production time is 6 to 8 weeks. Ar-bol will contact you to arrange delivery of your piece.</span></p>
           <div class="step-actions"><div class="spacer"></div><button type="button" class="btn btn-ghost" id="restart"><span lang="fr">Nouvelle commande</span><span lang="en">New order</span></button></div>
         </div>
       </div>
@@ -361,8 +376,8 @@
         </div>
         <div class="t">
           <span class="n">03</span>
-          <h4><span lang="fr">Retrait</span><span lang="en">Collection</span></h4>
-          <p><span lang="fr">Retrait gratuit convenu directement avec Ar-bol après la fabrication.</span><span lang="en">Free collection arranged directly with Ar-bol once production is complete.</span></p>
+          <h4><span lang="fr">Livraison au choix</span><span lang="en">Your delivery choice</span></h4>
+          <p><span lang="fr">Les modes proposés et leurs tarifs sont affichés avant le paiement.</span><span lang="en">Available methods and prices are shown before payment.</span></p>
         </div>
         <div class="t">
           <span class="n">04</span>
@@ -410,6 +425,6 @@
 </a>
 
 <script src="image-slot.js?v=photos-ateliers"></script>
-<script src="arbol-v2.js?v=mobile-photos"></script>
+<script src="arbol-v2.js?v=delivery-step"></script>
 </body>
 </html>

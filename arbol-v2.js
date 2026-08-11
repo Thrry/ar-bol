@@ -10,7 +10,7 @@
   /* ---------- Langue ---------- */
   var saved = null;
   try { saved = localStorage.getItem("arbol-lang"); } catch (e) {}
-  if (saved === "fr" || saved === "en") setLang(saved);
+  setLang(saved === "fr" || saved === "en" ? saved : (root.getAttribute("lang") === "en" ? "en" : "fr"));
   function setLang(lang) {
     root.setAttribute("lang", lang);
     root.setAttribute("data-lang", lang);
@@ -18,6 +18,10 @@
       b.classList.toggle("active", b.getAttribute("data-setlang") === lang);
     });
     try { localStorage.setItem("arbol-lang", lang); } catch (e) {}
+    if (state && currentProduct()) {
+      updateProductPrice();
+      renderShippingChoices();
+    }
   }
   document.querySelectorAll("[data-setlang]").forEach(function (b) {
     b.addEventListener("click", function () { setLang(b.getAttribute("data-setlang")); });
@@ -128,7 +132,7 @@
   onScroll();
 
   /* ---------- Commande / paiement ---------- */
-  var state = { variant: null };
+  var state = { variant: null, shippingRuleId: null };
   var variantFallbackNames = { unan: "Unan", daou: "Daou", tri: "Tri", pevar: "Pevar" };
   var variantImageSources = {
     unan: "assets/photo-unan-noir-noir.webp",
@@ -142,7 +146,7 @@
   var chatwebProduct = null;
   var chatwebProducts = {};
   var chatwebVariants = {};
-  var chatwebShippingRule = null;
+  var chatwebShippingRules = [];
   var chatwebShopReady = false;
   var syncEditionFromProduct = function () {};
   var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -181,15 +185,47 @@
     var variant = currentVariant();
     return (variant && variant.name) || variantFallbackNames[state.variant] || "—";
   }
+  function currentShippingRule() {
+    return chatwebShippingRules.find(function (rule) { return String(rule.id) === String(state.shippingRuleId); }) || null;
+  }
   function setConfirmationVariantName(name) {
     var confVar = document.getElementById("confVar");
     var confVarEn = document.getElementById("confVarEn");
     if (confVar) confVar.textContent = name;
     if (confVarEn) confVarEn.textContent = name;
   }
+  function setConfirmationDelivery(name, totalFr, totalEn) {
+    var shippingFr = document.getElementById("confShipping");
+    var shippingEn = document.getElementById("confShippingEn");
+    var amountFr = document.getElementById("confTotal");
+    var amountEn = document.getElementById("confTotalEn");
+    if (shippingFr) shippingFr.textContent = name || "—";
+    if (shippingEn) shippingEn.textContent = name || "—";
+    if (amountFr) amountFr.textContent = totalFr || "—";
+    if (amountEn) amountEn.textContent = totalEn || "—";
+  }
+  function formatMoneyForLocale(amount, currency, locale) {
+    var hasCents = Math.abs(amount || 0) % 100 !== 0;
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: (currency || "eur").toUpperCase(),
+      minimumFractionDigits: hasCents ? 2 : 0,
+      maximumFractionDigits: hasCents ? 2 : 0
+    }).format((amount || 0) / 100);
+  }
   function formatMoney(amount, currency) {
-    var locale = root.getAttribute("data-lang") === "en" ? "en-GB" : "fr-FR";
-    return new Intl.NumberFormat(locale, { style: "currency", currency: (currency || "eur").toUpperCase(), maximumFractionDigits: 0 }).format(amount / 100);
+    return formatMoneyForLocale(amount, currency, root.getAttribute("data-lang") === "en" ? "en-GB" : "fr-FR");
+  }
+  function shippingAmountFor(rule, product) {
+    if (!rule || !product) return null;
+    if (rule.pickup || (typeof rule.free_over_amount === "number" && product.unit_amount >= rule.free_over_amount)) return 0;
+    return Number(rule.amount) || 0;
+  }
+  function currentTotalAmount() {
+    var product = currentProduct();
+    if (!product) return null;
+    var shippingAmount = shippingAmountFor(currentShippingRule(), product);
+    return shippingAmount === null ? product.unit_amount : product.unit_amount + shippingAmount;
   }
   function setShopMessage(fr, en, error) {
     if (!secureNote) return;
@@ -200,16 +236,111 @@
     var product = currentProduct();
     if (!product) return;
     var price = formatMoney(product.unit_amount, product.currency);
+    var shippingRule = currentShippingRule();
+    var shippingAmount = shippingAmountFor(shippingRule, product);
+    var totalAmount = shippingAmount === null ? product.unit_amount : product.unit_amount + shippingAmount;
+    var total = formatMoney(totalAmount, product.currency);
     var shopPrice = document.getElementById("shopPrice");
+    var shopPayable = document.getElementById("shopPayable");
+    var recapSubtotal = document.getElementById("recapSubtotal");
+    var recapShippingPrice = document.getElementById("recapShippingPrice");
     var recapTotal = document.getElementById("recapTotal");
     if (shopPrice) shopPrice.textContent = price;
-    if (recapTotal) recapTotal.textContent = price;
+    if (shopPayable) shopPayable.textContent = price;
+    if (recapSubtotal) recapSubtotal.textContent = price;
+    if (recapShippingPrice) recapShippingPrice.textContent = shippingAmount === null ? "—" : formatMoney(shippingAmount, product.currency);
+    if (recapTotal) recapTotal.textContent = shippingAmount === null ? "—" : total;
     if (payBtn) {
       var payFr = payBtn.querySelector('span[lang="fr"]');
       var payEn = payBtn.querySelector('span[lang="en"]');
-      if (payFr) payFr.textContent = "Payer — " + new Intl.NumberFormat("fr-FR", { style: "currency", currency: product.currency.toUpperCase(), maximumFractionDigits: 0 }).format(product.unit_amount / 100);
-      if (payEn) payEn.textContent = "Pay — " + new Intl.NumberFormat("en-GB", { style: "currency", currency: product.currency.toUpperCase(), maximumFractionDigits: 0 }).format(product.unit_amount / 100);
+      if (payFr) payFr.textContent = "Payer — " + formatMoneyForLocale(totalAmount, product.currency, "fr-FR");
+      if (payEn) payEn.textContent = "Pay — " + formatMoneyForLocale(totalAmount, product.currency, "en-GB");
     }
+  }
+  var shippingChoices = document.getElementById("shippingChoices");
+  var toStep3 = document.getElementById("toStep3");
+  function shippingRuleMeta(rule, product) {
+    if (rule.pickup) return langHtml("À convenir après fabrication", "Arranged after production");
+    if (typeof rule.free_over_amount === "number") {
+      return langHtml(
+        "Offert dès " + formatMoneyForLocale(rule.free_over_amount, product.currency, "fr-FR"),
+        "Free from " + formatMoneyForLocale(rule.free_over_amount, product.currency, "en-GB")
+      );
+    }
+    return langHtml("Tarif ajouté au paiement", "Price added at payment");
+  }
+  function shippingRulePrice(rule, product) {
+    var amount = shippingAmountFor(rule, product);
+    if (amount === 0) return langHtml("Gratuit", "Free");
+    return langHtml(
+      formatMoneyForLocale(amount, product.currency, "fr-FR"),
+      formatMoneyForLocale(amount, product.currency, "en-GB")
+    );
+  }
+  function renderShippingChoices() {
+    if (!shippingChoices) return;
+    var product = currentProduct() || chatwebProduct || Object.keys(chatwebProducts).map(function (slug) { return chatwebProducts[slug]; })[0];
+    shippingChoices.setAttribute("aria-busy", "false");
+    shippingChoices.innerHTML = "";
+    if (!product || chatwebShippingRules.length === 0) {
+      shippingChoices.className = "shipping-state is-error";
+      shippingChoices.innerHTML = langHtml(
+        "Aucun mode de livraison n’est disponible pour le moment.",
+        "No delivery method is currently available."
+      );
+      state.shippingRuleId = null;
+      if (toStep3) toStep3.disabled = true;
+      return;
+    }
+    if (!currentShippingRule()) state.shippingRuleId = null;
+    shippingChoices.className = "shipping-choices";
+    chatwebShippingRules.forEach(function (rule) {
+      var option = document.createElement("label");
+      option.className = "shipping-option";
+      option.title = rule.name;
+
+      var input = document.createElement("input");
+      input.type = "radio";
+      input.name = "shipping_rule";
+      input.value = String(rule.id);
+      input.checked = String(rule.id) === String(state.shippingRuleId);
+      input.setAttribute("aria-label", rule.name);
+
+      var mark = document.createElement("span");
+      mark.className = "shipping-option-mark";
+      mark.setAttribute("aria-hidden", "true");
+
+      var copy = document.createElement("span");
+      copy.className = "shipping-option-copy";
+      var name = document.createElement("strong");
+      name.className = "shipping-option-name";
+      name.textContent = rule.name;
+      var meta = document.createElement("span");
+      meta.className = "shipping-option-meta";
+      meta.innerHTML = shippingRuleMeta(rule, product);
+      copy.appendChild(name);
+      copy.appendChild(meta);
+
+      var price = document.createElement("span");
+      price.className = "shipping-option-price";
+      price.innerHTML = shippingRulePrice(rule, product);
+
+      option.appendChild(input);
+      option.appendChild(mark);
+      option.appendChild(copy);
+      option.appendChild(price);
+      option.classList.toggle("sel", input.checked);
+      input.addEventListener("change", function () {
+        if (!input.checked) return;
+        state.shippingRuleId = String(rule.id);
+        shippingChoices.querySelectorAll(".shipping-option").forEach(function (item) { item.classList.remove("sel"); });
+        option.classList.add("sel");
+        if (toStep3) toStep3.disabled = false;
+        updateProductPrice();
+      });
+      shippingChoices.appendChild(option);
+    });
+    if (toStep3) toStep3.disabled = !currentShippingRule();
   }
   var steps = document.querySelectorAll(".panel .step");
   var dots = document.querySelectorAll("#stepsInd .dot");
@@ -230,6 +361,7 @@
   });
   function fillRecap() {
     var rv = document.getElementById("recapVar");
+    var shippingName = document.getElementById("recapShippingName");
     rv.textContent = "";
     if (!state.variant) { rv.textContent = "—"; return; }
     var variantName = document.createElement("span");
@@ -237,6 +369,8 @@
     variantName.style.fontSize = "1.1rem";
     variantName.textContent = currentVariantName();
     rv.appendChild(variantName);
+    if (shippingName) shippingName.textContent = currentShippingRule() ? currentShippingRule().name : "—";
+    updateProductPrice();
   }
   var fName = document.getElementById("fName");
   var lName = document.getElementById("lName");
@@ -246,12 +380,16 @@
   function validPay() {
     var okName = fName.value.trim().length > 0;
     var okEmail = emailRe.test(email.value.trim());
-    payBtn.disabled = !(okName && okEmail && state.variant && currentProduct() && chatwebShippingRule && chatwebShopReady);
+    payBtn.disabled = !(okName && okEmail && state.variant && currentProduct() && currentShippingRule() && chatwebShopReady);
   }
   [fName, lName, email].forEach(function (inp) { inp.addEventListener("input", validPay); });
 
   document.querySelectorAll("[data-next]").forEach(function (b) {
-    b.addEventListener("click", function () { var n = parseInt(b.getAttribute("data-next"), 10); if (n === 2) { fillRecap(); validPay(); } gotoStep(n); });
+    b.addEventListener("click", function () {
+      var n = parseInt(b.getAttribute("data-next"), 10);
+      if (n === 3) { fillRecap(); validPay(); }
+      gotoStep(n);
+    });
   });
   document.querySelectorAll("[data-prev]").forEach(function (b) {
     b.addEventListener("click", function () { gotoStep(parseInt(b.getAttribute("data-prev"), 10)); });
@@ -260,13 +398,18 @@
     if (payBtn.disabled) return;
     var product = currentProduct();
     var variant = currentVariant();
+    var shippingRule = currentShippingRule();
+    var totalAmount = currentTotalAmount();
     var labels = payBtn.querySelectorAll("span[lang]");
     payBtn.disabled = true;
     labels.forEach(function (s) { s.dataset.orig = s.textContent; s.textContent = s.getAttribute("lang") === "fr" ? "Ouverture Stripe…" : "Opening Stripe…"; });
     try {
       sessionStorage.setItem("arbolPendingOrder", JSON.stringify({
         variant_slug: state.variant,
-        variant_name: currentVariantName()
+        variant_name: currentVariantName(),
+        shipping_name: shippingRule.name,
+        total_fr: formatMoneyForLocale(totalAmount, product.currency, "fr-FR"),
+        total_en: formatMoneyForLocale(totalAmount, product.currency, "en-GB")
       }));
     } catch (e) {}
     var checkoutPayload = {
@@ -274,7 +417,7 @@
       "checkout[quantity]": "1",
       "checkout[customer_email]": email.value.trim(),
       "checkout[customer_name]": (fName.value.trim() + " " + lName.value.trim()).trim(),
-      "checkout[shipping_rule_id]": String(chatwebShippingRule.id)
+      "checkout[shipping_rule_id]": String(shippingRule.id)
     };
     if (chatwebProduct && variant) checkoutPayload["checkout[variant_slug]"] = variant.slug;
     chatwebPost("/shop/checkout", checkoutPayload).then(function (data) {
@@ -287,9 +430,15 @@
     });
   });
   document.getElementById("restart").addEventListener("click", function () {
-    state = { variant: null };
+    state = { variant: null, shippingRuleId: null };
     varCards.forEach(function (c) { c.classList.remove("sel"); });
-    toStep2.disabled = true; payBtn.disabled = true;
+    if (shippingChoices) {
+      shippingChoices.querySelectorAll('input[type="radio"]').forEach(function (input) { input.checked = false; });
+      shippingChoices.querySelectorAll(".shipping-option").forEach(function (option) { option.classList.remove("sel"); });
+    }
+    toStep2.disabled = true;
+    if (toStep3) toStep3.disabled = true;
+    payBtn.disabled = true;
     fName.value = ""; lName.value = ""; email.value = "";
     gotoStep(1);
   });
@@ -301,8 +450,9 @@
     stripeReturnSlug = params.get("composition") || pending.variant_slug || null;
     var variantName = pending.variant_name || variantFallbackNames[stripeReturnSlug] || pending.variant || "—";
     setConfirmationVariantName(variantName);
+    setConfirmationDelivery(pending.shipping_name, pending.total_fr, pending.total_en);
     try { sessionStorage.removeItem("arbolPendingOrder"); } catch (e) {}
-    gotoStep(3);
+    gotoStep(4);
     if (reserveSec) reserveSec.scrollIntoView({ block: "start" });
   })();
 
@@ -336,12 +486,15 @@
       if (stripeReturnSlug && chatwebVariants[stripeReturnSlug]) {
         setConfirmationVariantName(chatwebVariants[stripeReturnSlug].name);
       }
-      chatwebShippingRule = (shop.shipping_rules || [])[0] || null;
-      chatwebShopReady = !!shop.checkout_available && !!chatwebShippingRule && varCards.length > 0 && Array.prototype.some.call(varCards, function (card) { return !card.disabled; });
+      chatwebShippingRules = shop.shipping_rules || [];
+      renderShippingChoices();
+      chatwebShopReady = !!shop.checkout_available && chatwebShippingRules.length > 0 && varCards.length > 0 && Array.prototype.some.call(varCards, function (card) { return !card.disabled; });
       var displayProduct = chatwebProduct || products[0];
       if (displayProduct) {
         var shopPrice = document.getElementById("shopPrice");
+        var shopPayable = document.getElementById("shopPayable");
         if (shopPrice) shopPrice.textContent = formatMoney(displayProduct.unit_amount, displayProduct.currency);
+        if (shopPayable) shopPayable.textContent = formatMoney(displayProduct.unit_amount, displayProduct.currency);
         syncEditionFromProduct(displayProduct);
       }
       if (chatwebShopReady) {
@@ -351,6 +504,8 @@
       }
       validPay();
     }).catch(function () {
+      chatwebShippingRules = [];
+      renderShippingChoices();
       setShopMessage("La boutique est momentanément indisponible.", "The shop is temporarily unavailable.", true);
     });
 
