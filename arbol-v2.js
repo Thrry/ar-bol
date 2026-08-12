@@ -239,9 +239,11 @@
   }
   function shippingAmountFor(rule, product) {
     if (!rule || !product) return null;
-    var subtotal = product.unit_amount * totalQuantity();
+    var quantity = totalQuantity();
+    var subtotal = product.unit_amount * quantity;
     if (rule.pickup || (typeof rule.free_over_amount === "number" && subtotal >= rule.free_over_amount)) return 0;
-    return Number(rule.amount) || 0;
+    var additionalItemAmount = Number(rule.additional_item_amount) || 0;
+    return (Number(rule.amount) || 0) + additionalItemAmount * Math.max(quantity - 1, 0);
   }
   function currentSubtotalAmount() {
     var product = currentProduct();
@@ -294,6 +296,12 @@
       return langHtml(
         "Offert dès " + formatMoneyForLocale(rule.free_over_amount, product.currency, "fr-FR"),
         "Free from " + formatMoneyForLocale(rule.free_over_amount, product.currency, "en-GB")
+      );
+    }
+    if ((Number(rule.additional_item_amount) || 0) > 0) {
+      return langHtml(
+        "+ " + formatMoneyForLocale(rule.additional_item_amount, product.currency, "fr-FR") + " par article supplémentaire",
+        "+ " + formatMoneyForLocale(rule.additional_item_amount, product.currency, "en-GB") + " per additional item"
       );
     }
     return langHtml("Tarif ajouté au paiement", "Price added at payment");
