@@ -226,7 +226,10 @@
 
   class ImageSlot extends HTMLElement {
     static get observedAttributes() {
-      return ['shape', 'radius', 'mask', 'fit', 'position', 'placeholder', 'src', 'id'];
+      return [
+        'shape', 'radius', 'mask', 'fit', 'position', 'placeholder', 'src', 'id',
+        'alt', 'loading', 'fetchpriority', 'srcset', 'sizes', 'static'
+      ];
     }
 
     constructor() {
@@ -237,14 +240,14 @@
       root.innerHTML =
         '<style>' + stylesheet + '</style>' +
         '<div class="frame" part="frame">' +
-        '  <img part="image" alt="" draggable="false" style="display:none">' +
+        '  <img part="image" alt="" draggable="false" decoding="async" style="display:none">' +
         '  <div class="empty" part="empty">' + icon +
         '    <div class="cap"></div>' +
         '    <div class="sub">or <u>browse files</u></div></div>' +
         '  <div class="ring" part="ring"></div>' +
         '</div>' +
         '<div class="spill">' +
-        '  <img class="ghost" alt="" draggable="false">' +
+        '  <img class="ghost" alt="" draggable="false" loading="lazy" decoding="async">' +
         '  <div class="handle" data-c="nw"></div><div class="handle" data-c="ne"></div>' +
         '  <div class="handle" data-c="sw"></div><div class="handle" data-c="se"></div>' +
         '</div>' +
@@ -396,9 +399,11 @@
       // re-seeds _view from stored before clamp/apply, so a shrink→grow
       // cycle round-trips instead of ratcheting x/y toward the narrower
       // frame's clamp range.
-      this._ro = new ResizeObserver(() => this._render());
-      this._ro.observe(this);
-      load();
+      if (!this.hasAttribute('static')) {
+        this._ro = new ResizeObserver(() => this._render());
+        this._ro.observe(this);
+      }
+      if (!this.hasAttribute('static')) load();
       this._render();
     }
 
@@ -535,8 +540,17 @@
     }
 
     _applyView() {
-      const g = this._geom();
       const fit = this.getAttribute('fit') || 'cover';
+      if (this.hasAttribute('static')) {
+        this._img.style.width = '100%';
+        this._img.style.height = '100%';
+        this._img.style.left = '50%';
+        this._img.style.top = '50%';
+        this._img.style.objectFit = fit;
+        this._img.style.objectPosition = this.getAttribute('position') || '50% 50%';
+        return;
+      }
+      const g = this._geom();
       if (fit !== 'cover' || !g) {
         // Non-cover, or dimensions not known yet (before img load).
         this._img.style.width = '100%';
@@ -593,7 +607,7 @@
       this._ring.style.display = mask ? 'none' : '';
 
       // Controls and reframe entry gate on this so share links stay read-only.
-      const editable = !!(window.omelette && window.omelette.writeFile);
+      const editable = !this.hasAttribute('static') && !!(window.omelette && window.omelette.writeFile);
       this.toggleAttribute('data-editable', editable);
       this._sub.style.display = editable ? '' : 'none';
 
@@ -606,6 +620,22 @@
       const srcAttr = this.getAttribute('src') || '';
       this._userUrl = (stored && stored.u) || null;
       const url = this._userUrl || srcAttr;
+      const authoredSource = !this._userUrl;
+      const loading = this.getAttribute('loading') || (this.getAttribute('fetchpriority') === 'high' ? 'eager' : 'lazy');
+      const fetchPriority = this.getAttribute('fetchpriority') || 'auto';
+      const alt = this.getAttribute('alt') || this.getAttribute('placeholder') || '';
+      const srcset = authoredSource ? (this.getAttribute('srcset') || '') : '';
+      const sizes = authoredSource ? (this.getAttribute('sizes') || '') : '';
+      if (this._img.alt !== alt) this._img.alt = alt;
+      if (this._img.loading !== loading) this._img.loading = loading;
+      if (this._img.decoding !== 'async') this._img.decoding = 'async';
+      if (this._img.fetchPriority !== fetchPriority) this._img.fetchPriority = fetchPriority;
+      if (this._img.getAttribute('srcset') !== srcset) {
+        if (srcset) this._img.setAttribute('srcset', srcset); else this._img.removeAttribute('srcset');
+      }
+      if (this._img.getAttribute('sizes') !== sizes) {
+        if (sizes) this._img.setAttribute('sizes', sizes); else this._img.removeAttribute('sizes');
+      }
       // Don't clobber an in-flight reframe with a store-triggered re-render.
       if (!this.hasAttribute('data-reframe')) {
         this._view = {
@@ -620,12 +650,13 @@
       if (url) {
         if (this._img.getAttribute('src') !== url) {
           this._img.src = url;
-          this._ghost.src = url;
         }
+        if (this.hasAttribute('static')) this._ghost.removeAttribute('src');
+        else if (this._ghost.getAttribute('src') !== url) this._ghost.src = url;
         this._img.style.display = 'block';
         this._empty.style.display = 'none';
         this.setAttribute('data-filled', '');
-        this._clampView();
+        if (!this.hasAttribute('static')) this._clampView();
         this._applyView();
       } else {
         this._img.style.display = 'none';

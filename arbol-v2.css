@@ -8,23 +8,46 @@
    Plein cadre, grain, parallaxe, masques organiques.
    ========================================================= */
 
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url("assets/fonts/cormorant-garamond-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: italic;
+  font-weight: 300 500;
+  font-display: swap;
+  src: url("assets/fonts/cormorant-garamond-italic-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Hanken Grotesk";
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url("assets/fonts/hanken-grotesk-latin.woff2") format("woff2");
+}
+
 :root {
   --paper:    #f4efe6;
   --paper-2:  #e8dfd0;
   --ink:      #1a1712;
   --ink-soft: #5a5047;
+  --ink-muted:#706453;
 
   --night:     #15120e;   /* fond cinéma */
   --night-2:   #1d1913;
   --on-night:       #efe7da;
   --on-night-soft:  #b0a593;
-  --on-night-faint: #786d5c;
+  --on-night-faint: #8f8473;
 
   --line-d: rgba(239,231,218,0.14);
   --line-l: rgba(26,23,18,0.14);
 
   --cypress: oklch(0.56 0.045 158);
-  --wood:    oklch(0.6 0.055 64);
+  --wood:    oklch(0.62 0.055 64);
   --accent:  var(--wood);
 
   --serif: "Cormorant Garamond", Georgia, serif;
@@ -123,7 +146,7 @@ img { display:block; max-width:100%; }
 
 /* sections claires (interludes) */
 .section.light { background: var(--paper); color: var(--ink); }
-.section.light .eyebrow { color: #8a7f6f; }
+.section.light .eyebrow { color: var(--ink-muted); }
 .section.light .body-text { color: var(--ink-soft); }
 .section.light .lede { color: var(--ink); }
 
@@ -166,7 +189,7 @@ img { display:block; max-width:100%; }
   font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
   color: var(--on-night-faint);
 }
-.section.light .chapter-tag { color: #9a8f7e; }
+.section.light .chapter-tag { color: var(--ink-muted); }
 @media (max-width: 1100px){ .chapter-tag { display:none; } }
 
 /* ---------- MANIFESTE ---------- */
@@ -489,7 +512,7 @@ img { display:block; max-width:100%; }
 .care { margin-top: clamp(3rem,7vw,5rem); border-top: 1px solid var(--line-l); padding-top: clamp(2rem,4vw,3.5rem); display:grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(2rem,5vw,5rem); align-items:start; }
 .care h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.8rem,3.5vw,2.6rem); margin: 0; }
 .care-cols { display:grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem,3vw,2.5rem); }
-.care-item .lbl { display:flex; align-items:center; gap:0.6rem; font-size:0.74rem; letter-spacing:0.16em; text-transform:uppercase; color:#8a7f6f; margin-bottom: 0.7rem; white-space: nowrap; }
+.care-item .lbl { display:flex; align-items:center; gap:0.6rem; font-size:0.74rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-muted); margin-bottom: 0.7rem; white-space: nowrap; }
 .care-item .lbl::before { content:""; width: 7px; height:7px; border:1px solid var(--accent); border-radius:50%; }
 .care-item p { margin:0; color: var(--ink-soft); font-size: 0.97rem; }
 @media (max-width: 800px){ .care{ grid-template-columns:1fr; gap:2rem; } }
@@ -529,7 +552,7 @@ img { display:block; max-width:100%; }
   font-size: 0.72rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #8a7f6f;
+  color: var(--ink-muted);
 }
 .fabrication-map {
   width: min(100%, 360px);
@@ -601,7 +624,7 @@ img { display:block; max-width:100%; }
 /* ---------- BANDEAU CONFIANCE (livraison / paiement) ---------- */
 .trust { margin-top: clamp(2.5rem,5vw,4rem); border-top:1px solid var(--line-d); padding-top: clamp(2rem,3vw,2.6rem); display:grid; grid-template-columns: repeat(4,1fr); gap: clamp(1.2rem,2.5vw,2.5rem); }
 .trust .t .n { font-family:var(--serif); font-style:italic; color: var(--accent); font-size:1.1rem; }
-.trust .t h4 { font-family: var(--serif); font-weight:400; font-size:1.25rem; margin: 0.4rem 0 0.45rem; }
+.trust .t h3 { font-family: var(--serif); font-weight:400; font-size:1.25rem; margin: 0.4rem 0 0.45rem; }
 .trust .t p { margin:0; font-size:0.86rem; color: var(--on-night-soft); }
 @media (max-width: 760px){ .trust{ grid-template-columns:1fr 1fr; gap:1.8rem; } }
 @media (max-width: 420px){ .trust{ grid-template-columns:1fr; } }
@@ -629,13 +652,6 @@ img { display:block; max-width:100%; }
 .foot-meta { font-size: 0.78rem; color: var(--on-night-soft); max-width: 34ch; }
 .foot-trademark { max-width: var(--maxw); margin: 2rem auto 0; padding: 0 var(--pad); color: var(--on-night-faint); }
 .foot-link { color: var(--accent); text-decoration: none; border-bottom:1px solid currentColor; }
-
-/* ---------- Révélations (filet JS — cf. arbol-v2.js) ---------- */
-html.js .reveal { opacity: 0; transform: translateY(20px); transition: opacity var(--rd) var(--ease), transform var(--rd) var(--ease); }
-html.js .reveal.d1 { transition-delay: 90ms; }
-html.js .reveal.d2 { transition-delay: 180ms; }
-html.js .reveal.d3 { transition-delay: 270ms; }
-html.js .reveal.in { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce){
   html { scroll-behavior:auto; }

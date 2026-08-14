@@ -36,35 +36,6 @@
     b.addEventListener("click", function () { setLang(b.getAttribute("data-setlang")); });
   });
 
-  /* ---------- Révélations (état visible verrouillé par filet) ---------- */
-  var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
-  if (reduce) {
-    reveals.forEach(function (el) { el.classList.add("in"); });
-  } else {
-    root.classList.add("js");
-    if ("IntersectionObserver" in window) {
-      var revealObserver = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          reveal(entry.target);
-          revealObserver.unobserve(entry.target);
-        });
-      }, { rootMargin: "0px 0px -10% 0px" });
-      reveals.forEach(function (el) { revealObserver.observe(el); });
-    } else {
-      reveals.forEach(reveal);
-    }
-  }
-  function reveal(el) {
-    if (el.__rv) return; el.__rv = true;
-    el.classList.add("in");
-    setTimeout(function () {
-      el.style.transition = "none";
-      el.style.opacity = "1";
-      el.style.transform = "none";
-    }, 1250);
-  }
-
   /* ---------- Trait qui se dessine ---------- */
   var rules = Array.prototype.slice.call(document.querySelectorAll("[data-draw]"));
   if (!reduce) rules.forEach(function (r) { r.style.transform = "scaleX(0)"; });
@@ -568,7 +539,7 @@
         var name = card.querySelector(".nm");
         var image = card.querySelector("img");
         if (name && variant && variant.name) name.textContent = variant.name;
-        if (image && variantImageSources[slug]) image.src = variantImageSources[slug];
+        if (image && variantImageSources[slug] && !image.hasAttribute("srcset")) image.src = variantImageSources[slug];
         if (image && variant && variant.name) image.alt = variant.name;
       });
       chatwebShippingRules = shop.shipping_rules || [];

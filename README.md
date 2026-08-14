@@ -38,16 +38,17 @@ gh api -X POST repos/thrry/ar-bol/pages -f "source[branch]=main" -f "source[path
 gh api repos/thrry/ar-bol/pages
 ```
 
-URL attendue : `https://thrry.github.io/ar-bol/`
+URL publique : `https://ar-bol.fr/`
 Le `.nojekyll` (déjà présent) empêche Jekyll de filtrer des fichiers.
 
 **Mises à jour ultérieures :** `git add . && git commit -m "maj" && git push`.
 
-## 2 bis. Brancher Brevo
+## 2 bis. Services Brevo historiques
 
-Le formulaire de commande et la liste d'attente appellent
-`/api/brevo-contact`. Cet endpoint est dans `functions/api/brevo-contact.js` et
-doit tourner côté serveur, par exemple via Cloudflare Pages Functions.
+La commande et la liste d'attente publiques passent désormais par Chatweb.
+L'endpoint `/api/brevo-contact`, son dashboard et les variables ci-dessous sont
+conservés pour les anciens flux Brevo et l'administration, mais ne pilotent plus
+le parcours principal du site.
 
 Ne jamais mettre la clé Brevo dans `index.html` ou `arbol-v2.js`.
 
@@ -86,11 +87,9 @@ créer une liste Brevo, un template de confirmation double opt-in, puis brancher
 le formulaire d'attente sur ce flux avant d'envoyer des campagnes. Les campagnes
 Brevo devront aussi contenir leur lien de désinscription natif.
 
-GitHub Pages ne peut pas exécuter cet endpoint serverless. Si le site est servi
-uniquement par GitHub Pages, la commande redirige quand même vers Stripe, mais la
-liste d'attente peut afficher une erreur d'enregistrement. Il faut publier le
-même dossier via Cloudflare Pages, Netlify, Vercel ou ajouter un autre proxy
-serveur qui garde la clé Brevo privée.
+GitHub Pages ne peut pas exécuter cet endpoint serverless. Les fonctions Brevo
+historiques nécessitent donc toujours un hébergement compatible, mais le parcours
+public actuel n'en dépend pas.
 
 ## 2 ter. Paiement Stripe
 
@@ -108,7 +107,7 @@ plus de compteur Stripe ou de valeur manuelle en parallèle.
 ## 3. Structure des fichiers
 
 ```
-site-claude-design/
+site-carnet-rivage/
 ├── index.html        ← le site (toute la structure + le contenu bilingue)
 ├── arbol-v2.css      ← styles + design tokens (variables en :root)
 ├── arbol-v2.js       ← interactions (langue, reveals, parallaxe, réservation, canvas)
@@ -124,13 +123,13 @@ site-claude-design/
 3. **L'objet** (Chapitre II) — scène + specs (hauteur, diamètre, matières)
 4. **Ar-bol à vivre** — triptyque cadré : Fruits · Nature morte & végétale · Parfum & choses précieuses
 5. **Variations** (Chapitre III) — 4 modèles : Unan, Daou, Tri, Pevar (lignes alternées, grands chiffres)
-6. **La matière · Le bois** (Chapitre IV) — texte + artisan tourneur + canvas « anneaux du bois » animé en fond
+6. **La matière · Le bois** (Chapitre IV) — texte + photographie de l'atelier de tournage
 7. **La matière · La faïence** — texte + atelier
 8. **Finistère** — fond filigrane carte (crayon, multiply)
 9. **Le designer** — portrait + bio, puis « Les mains d'Ar-bol » (tourneur + potière)
 10. **Série limitée** (Chapitre V) — jauge des 50 synchronisée avec Stripe + socle manuel
-11. **Commande** (Chapitre VI) — parcours guidé 3 étapes : composition → paiement Stripe → confirmation, + bandeau confiance
-12. **Liste d'attente** — formulaire email (validation front)
+11. **Commande** (Chapitre VI) — parcours guidé 4 étapes : composition → livraison → paiement Stripe → confirmation, + bandeau confiance
+12. **Liste d'attente** — inscription avec consentement via Chatweb
 13. **Footer**
 
 ## 5. Conventions à respecter pour continuer
@@ -141,25 +140,20 @@ site-claude-design/
 - **Design tokens** : couleurs / fontes / espacements sont des variables CSS dans
   `:root` (arbol-v2.css). Réutiliser ces variables, ne pas inventer de couleurs.
   Fontes : Cormorant Garamond (serif, titres) + Hanken Grotesk (sans, courant).
-- **Animations d'apparition** : ajouter la classe `reveal` (+ `d1`/`d2`/`d3` pour
-  décaler) à tout nouvel élément à révéler au scroll. Géré par `arbol-v2.js`.
-- **Images** : composant `<image-slot id="…" src="assets/…" placeholder="…">`.
-  Le `placeholder` sert de légende/brief si l'image manque. Formats portrait
-  privilégiés (2:3 ou 4:5).
-- **Animations de fond** : `<canvas>` pilotés en JS (anneaux du bois = `#lathe`).
-  Respectent `prefers-reduced-motion`.
+- **Images** : composant `<image-slot static id="…" src="assets/…" srcset="…" sizes="…" alt="…">`.
+  Les images du site public sont non éditables, responsives et chargées paresseusement
+  hors du hero. Formats portrait privilégiés (2:3 ou 4:5).
 
 ## 6. À finaliser avant publication réelle
 
 - **Noms d'ateliers/artisans** : Gwenaël Tanguy (tourneur), Annaïg Le Goff (potière)
   sont **inventés** — à confirmer/remplacer (mention déjà présente sur le site).
-- **Paiement** : Stripe est branché en mode test via Payment Links publics.
-  Remplacer les liens test par les liens live avant ouverture commerciale.
-- **Liste d'attente** : le formulaire enregistre le contact dans Brevo via
-  `/api/brevo-contact` lorsque l'endpoint serverless est disponible.
-- **Images** : ce sont des visuels générés ; remplacer par les photos finales HD
-  quand disponibles (mêmes noms de fichiers dans `assets/` = aucun changement de code).
-- **Poids** : ~30 Mo d'images PNG. Pour accélérer le chargement, convertir en WebP.
+- **Paiement** : le checkout Stripe est créé par la boutique Chatweb avec la
+  composition, la quantité et le mode de livraison choisis.
+- **Liste d'attente** : le formulaire public enregistre le contact via Chatweb.
+- **SEO et performance** : audit Lighthouse du 14 août 2026 — mobile 95/100,
+  desktop 100/100, SEO 100/100, accessibilité 100/100. Les illustrations lourdes
+  sont servies en AVIF, les photos en WebP responsive et les polices sont locales.
 
 ## 7. Versions
 

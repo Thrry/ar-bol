@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ar-bol — Coupe à fruits sculpturale</title>
 <meta name="description" content="Ar-bol, coupe à fruits sculpturale en édition limitée à 50 exemplaires, fabriquée artisanalement dans le Finistère.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#15120e">
 <link rel="canonical" href="https://ar-bol.fr/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
+<meta property="og:locale:alternate" content="en_GB">
 <meta property="og:site_name" content="Ar-bol">
 <meta property="og:url" content="https://ar-bol.fr/">
 <meta property="og:title" content="Ar-bol — Coupe à fruits sculpturale">
@@ -23,11 +27,37 @@
 <meta name="twitter:image" content="https://ar-bol.fr/assets/photo-tri-blanc-bois-clair.webp">
 <meta name="twitter:image:alt" content="Ar-bol Tri, coupe à fruits en faïence blanche et bois clair.">
 <meta name="chatweb-api-base" content="https://api.chatweb.app/api/v1/sites/ar-bol">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" href="assets/photo-hero-tableau.webp" type="image/webp">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="arbol-v2.css?v=stacked-quantity">
+<link rel="preload" as="font" href="assets/fonts/cormorant-garamond-latin.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="assets/fonts/cormorant-garamond-italic-latin.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="font" href="assets/fonts/hanken-grotesk-latin.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="assets/photo-hero-tableau-1400.webp" imagesrcset="assets/photo-hero-tableau-900.webp 900w, assets/photo-hero-tableau-1400.webp 1400w, assets/photo-hero-tableau.webp 1800w" imagesizes="100vw" type="image/webp" fetchpriority="high">
+<link rel="stylesheet" href="arbol-v2.css?v=seo-performance">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Ar-bol",
+  "description": "Coupe à fruits sculpturale en faïence et bois, fabriquée artisanalement dans le Finistère et proposée en édition limitée à 50 exemplaires.",
+  "image": [
+    "https://ar-bol.fr/assets/photo-unan-noir-noir.webp",
+    "https://ar-bol.fr/assets/photo-daou-noir-bois-clair.webp",
+    "https://ar-bol.fr/assets/photo-tri-blanc-bois-clair.webp",
+    "https://ar-bol.fr/assets/photo-pevar-blanc-noir.webp"
+  ],
+  "brand": {
+    "@type": "Brand",
+    "name": "Ar-bol"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "https://ar-bol.fr/#reserver",
+    "priceCurrency": "EUR",
+    "price": "420.00",
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+}
+</script>
 </head>
 <body>
 <template id="__bundler_thumbnail">
@@ -63,7 +93,10 @@
   <!-- ===== HERO plein cadre ===== -->
   <section class="hero">
     <div class="hero-bg" data-par="0.18">
-      <image-slot id="v2-hero" src="assets/photo-hero-tableau.webp" shape="rect" fit="cover"
+      <image-slot id="v2-hero" static src="assets/photo-hero-tableau.webp"
+        srcset="assets/photo-hero-tableau-900.webp 900w, assets/photo-hero-tableau-1400.webp 1400w, assets/photo-hero-tableau.webp 1800w"
+        sizes="100vw" shape="rect" fit="cover" loading="eager" fetchpriority="high"
+        alt="Ar-bol devant un tableau, photographie de Kevin Guiri Couderc."
         placeholder="Ar-bol devant un tableau, photographie de Kevin Guiri Couderc."></image-slot>
     </div>
     <div class="hero-veil"></div>
@@ -84,7 +117,9 @@
   <!-- ===== MANIFESTE ===== -->
   <section class="section chapter manifesto-sec">
     <span class="chapter-tag"><span lang="fr">Chapitre I</span><span lang="en">Chapter I</span></span>
-    <img class="bg-ill bg-ill-cypres" src="assets/ill-cypres.png" alt="" aria-hidden="true">
+    <img class="bg-ill bg-ill-cypres" src="assets/ill-cypres-768.avif"
+      srcset="assets/ill-cypres-512.avif 512w, assets/ill-cypres-640.avif 640w, assets/ill-cypres-768.avif 768w, assets/ill-cypres-1023.avif 1023w"
+      sizes="(max-width: 700px) 86vw, 52vw" width="1023" height="1537" loading="lazy" decoding="async" alt="" aria-hidden="true">
     <div class="manifesto-wrap">
       <p class="manifesto-line reveal" lang="fr">Ar-bol s'inspire des <span class="mk">cyprès centenaires</span> de Douarnenez, rapportés jadis par les marins — des formes organiques enracinées sur les côtes de <span class="mk">granit</span>, témoins des grandes traversées.</p>
       <p class="manifesto-line reveal" lang="en">Ar-bol draws on the <span class="mk">century-old cypress</span> of Douarnenez, once brought back by sailors — organic forms rooted in the <span class="mk">granite</span> coast, witnesses to long crossings.</p>
@@ -109,7 +144,7 @@
         <div class="vrow-media reveal">
           <span class="vrow-num">01</span>
           <div class="media" data-par="0.07"><div class="par-inner">
-            <image-slot id="v2-unan" src="assets/photo-unan-noir-noir.webp" shape="rect" fit="cover" placeholder="Ar-bol Unan — faïence noire et bois noir."></image-slot>
+            <image-slot id="v2-unan" static src="assets/photo-unan-noir-noir.webp" srcset="assets/photo-unan-noir-noir-720.webp 720w, assets/photo-unan-noir-noir-900.webp 900w, assets/photo-unan-noir-noir-1080.webp 1080w, assets/photo-unan-noir-noir.webp 1350w" sizes="(max-width: 900px) 100vw, 50vw" shape="rect" fit="cover" loading="lazy" alt="Ar-bol Unan — faïence noire et bois noir." placeholder="Ar-bol Unan — faïence noire et bois noir."></image-slot>
           </div></div>
         </div>
         <div class="reveal d1">
@@ -129,7 +164,7 @@
         <div class="vrow-media reveal">
           <span class="vrow-num">02</span>
           <div class="media" data-par="0.07"><div class="par-inner">
-            <image-slot id="v2-daou" src="assets/photo-daou-noir-bois-clair.webp" shape="rect" fit="cover" placeholder="Ar-bol Daou — faïence noire et bois clair."></image-slot>
+            <image-slot id="v2-daou" static src="assets/photo-daou-noir-bois-clair.webp" srcset="assets/photo-daou-noir-bois-clair-720.webp 720w, assets/photo-daou-noir-bois-clair-900.webp 900w, assets/photo-daou-noir-bois-clair-1080.webp 1080w, assets/photo-daou-noir-bois-clair.webp 1350w" sizes="(max-width: 900px) 100vw, 50vw" shape="rect" fit="cover" loading="lazy" alt="Ar-bol Daou — faïence noire et bois clair." placeholder="Ar-bol Daou — faïence noire et bois clair."></image-slot>
           </div></div>
         </div>
         <div class="reveal d1">
@@ -149,7 +184,7 @@
         <div class="vrow-media reveal">
           <span class="vrow-num">03</span>
           <div class="media" data-par="0.07"><div class="par-inner">
-            <image-slot id="v2-tri" src="assets/photo-tri-blanc-bois-clair.webp" shape="rect" fit="cover" placeholder="Ar-bol Tri — faïence blanche et bois clair."></image-slot>
+            <image-slot id="v2-tri" static src="assets/photo-tri-blanc-bois-clair.webp" srcset="assets/photo-tri-blanc-bois-clair-720.webp 720w, assets/photo-tri-blanc-bois-clair-900.webp 900w, assets/photo-tri-blanc-bois-clair-1080.webp 1080w, assets/photo-tri-blanc-bois-clair.webp 1350w" sizes="(max-width: 900px) 100vw, 50vw" shape="rect" fit="cover" loading="lazy" alt="Ar-bol Tri — faïence blanche et bois clair." placeholder="Ar-bol Tri — faïence blanche et bois clair."></image-slot>
           </div></div>
         </div>
         <div class="reveal d1">
@@ -169,7 +204,7 @@
         <div class="vrow-media reveal">
           <span class="vrow-num">04</span>
           <div class="media" data-par="0.07"><div class="par-inner">
-            <image-slot id="v2-pevar" src="assets/photo-pevar-blanc-noir.webp" shape="rect" fit="cover" placeholder="Ar-bol Pevar — faïence blanche et bois noir."></image-slot>
+            <image-slot id="v2-pevar" static src="assets/photo-pevar-blanc-noir.webp" srcset="assets/photo-pevar-blanc-noir-720.webp 720w, assets/photo-pevar-blanc-noir-900.webp 900w, assets/photo-pevar-blanc-noir-1080.webp 1080w, assets/photo-pevar-blanc-noir.webp 1350w" sizes="(max-width: 900px) 100vw, 50vw" shape="rect" fit="cover" loading="lazy" alt="Ar-bol Pevar — faïence blanche et bois noir." placeholder="Ar-bol Pevar — faïence blanche et bois noir."></image-slot>
           </div></div>
         </div>
         <div class="reveal d1">
@@ -193,7 +228,9 @@
     <span class="chapter-tag"><span lang="fr">Chapitre IV</span><span lang="en">Chapter IV</span></span>
     <div class="wrap">
       <div class="fabrication-intro reveal">
-        <img class="fabrication-map" src="assets/ill-finistere.png?v=transparent" alt="" aria-hidden="true">
+        <img class="fabrication-map" src="assets/ill-finistere-512.avif"
+          srcset="assets/ill-finistere-320.avif 320w, assets/ill-finistere-512.avif 512w"
+          sizes="(max-width: 700px) 68vw, 32vw" width="1023" height="1537" loading="lazy" decoding="async" alt="" aria-hidden="true">
         <div>
           <p class="eyebrow"><span lang="fr">Fabrication</span><span lang="en">Craft</span></p>
           <h2 class="display"><span lang="fr">Une démarche ancrée dans le territoire.</span><span lang="en">A practice rooted in place.</span></h2>
@@ -212,7 +249,7 @@
       </div>
       <div class="matter">
         <div class="matter-media reveal">
-          <image-slot id="maker-bois" class="ms workshop-slot" shape="rect" fit="contain" src="assets/atelier-bois.webp" placeholder="Photographie de l’atelier de tournage sur bois."></image-slot>
+          <image-slot id="maker-bois" class="ms workshop-slot" static shape="rect" fit="contain" src="assets/atelier-bois.webp" srcset="assets/atelier-bois-720.webp 720w, assets/atelier-bois-1080.webp 1080w, assets/atelier-bois.webp 1086w" sizes="(max-width: 900px) 100vw, 50vw" loading="lazy" alt="Photographie de l’atelier de tournage sur bois." placeholder="Photographie de l’atelier de tournage sur bois."></image-slot>
         </div>
         <div class="matter-copy">
           <p class="lede reveal"><span lang="fr">Du bois massif tourné en une seule pièce à Plouhinec.</span><span lang="en">Solid wood turned in one piece in Plouhinec.</span></p>
@@ -232,7 +269,7 @@
       </div>
       <div class="matter flip">
         <div class="matter-media reveal">
-          <image-slot id="maker-faience" class="ms workshop-slot" shape="rect" fit="contain" src="assets/atelier-faience.webp" placeholder="Photographie de l’atelier de faïence."></image-slot>
+          <image-slot id="maker-faience" class="ms workshop-slot" static shape="rect" fit="contain" src="assets/atelier-faience.webp" srcset="assets/atelier-faience-720.webp 720w, assets/atelier-faience-1080.webp 1080w, assets/atelier-faience.webp 1086w" sizes="(max-width: 900px) 100vw, 50vw" loading="lazy" alt="Photographie de l’atelier de faïence." placeholder="Photographie de l’atelier de faïence."></image-slot>
         </div>
         <div class="matter-copy">
           <p class="lede reveal"><span lang="fr">Deux coupes de faïence coulées en moule et émaillées à Quimper.</span><span lang="en">Two mould-cast faience bowls glazed in Quimper.</span></p>
@@ -273,9 +310,7 @@
   <section class="section chapter" id="apropos">
     <div class="wrap designer">
       <div class="media blob reveal" data-par="0.06"><div class="par-inner">
-        <image-slot id="v2-designer" src="assets/designer-kevin.webp" shape="rect" fit="contain"
-         
-          placeholder="Portrait de Kevin Guiri Couderc."></image-slot>
+        <image-slot id="v2-designer" static src="assets/designer-kevin.webp" srcset="assets/designer-kevin-720.webp 720w, assets/designer-kevin-1080.webp 1080w, assets/designer-kevin.webp 1087w" sizes="(max-width: 820px) 100vw, 35vw" shape="rect" fit="contain" loading="lazy" alt="Portrait de Kevin Guiri Couderc." placeholder="Portrait de Kevin Guiri Couderc."></image-slot>
       </div></div>
       <div>
         <p class="eyebrow reveal"><span lang="fr">À propos</span><span lang="en">About</span></p>
@@ -291,7 +326,7 @@
         <div class="about-actions reveal d3">
           <a class="btn btn-ghost" href="https://kevinguiricouderc.myportfolio.com/" target="_blank" rel="noopener" aria-label="Mes autres créations"><span lang="fr">Mes autres créations</span><span lang="en">My other creations</span></a>
         </div>
-        <ul class="contact-list reveal d3" aria-label="Contacts">
+        <ul class="contact-list reveal d3">
           <li><span>E-mail</span><a href="mailto:kevinguiricouderc@gmail.com">kevinguiricouderc@gmail.com</a></li>
           <li><span>Instagram</span><a href="https://www.instagram.com/kevinguiri/" target="_blank" rel="noopener">@kevinguiri</a></li>
           <li><span>Site internet</span><a href="https://kevinguiricouderc.myportfolio.com/" target="_blank" rel="noopener">kevinguiricouderc.myportfolio.com</a></li>
@@ -333,10 +368,10 @@
         <div class="step active" data-step="1">
           <h3><span lang="fr">Choisissez vos compositions</span><span lang="en">Choose your compositions</span></h3>
           <div class="var-choices" id="varChoices">
-            <article class="var-card" data-variant-slug="unan"><div class="var-card-main"><img class="thumb" src="assets/photo-unan-noir-noir.webp" alt="Unan"><span><span class="nm">Unan</span><span class="ds"><span lang="fr">Faïence noire · bois noir</span><span lang="en">Black faience · black wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Unan">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Unan"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Unan">+</button></div></article>
-            <article class="var-card" data-variant-slug="daou"><div class="var-card-main"><img class="thumb" src="assets/photo-daou-noir-bois-clair.webp" alt="Daou"><span><span class="nm">Daou</span><span class="ds"><span lang="fr">Faïence noire · bois clair</span><span lang="en">Black faience · light wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Daou">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Daou"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Daou">+</button></div></article>
-            <article class="var-card" data-variant-slug="tri"><div class="var-card-main"><img class="thumb" src="assets/photo-tri-blanc-bois-clair.webp" alt="Tri"><span><span class="nm">Tri</span><span class="ds"><span lang="fr">Faïence blanche · bois clair</span><span lang="en">White faience · light wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Tri">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Tri"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Tri">+</button></div></article>
-            <article class="var-card" data-variant-slug="pevar"><div class="var-card-main"><img class="thumb" src="assets/photo-pevar-blanc-noir.webp" alt="Pevar"><span><span class="nm">Pevar</span><span class="ds"><span lang="fr">Faïence blanche · bois noir</span><span lang="en">White faience · black wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Pevar">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Pevar"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Pevar">+</button></div></article>
+            <article class="var-card" data-variant-slug="unan"><div class="var-card-main"><img class="thumb" src="assets/photo-unan-noir-noir-720.webp" srcset="assets/photo-unan-noir-noir-720.webp 720w, assets/photo-unan-noir-noir.webp 1350w" sizes="76px" width="1350" height="1800" loading="lazy" decoding="async" alt="Ar-bol Unan, faïence noire et bois noir"><span><span class="nm">Unan</span><span class="ds"><span lang="fr">Faïence noire · bois noir</span><span lang="en">Black faience · black wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Unan">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Unan"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Unan">+</button></div></article>
+            <article class="var-card" data-variant-slug="daou"><div class="var-card-main"><img class="thumb" src="assets/photo-daou-noir-bois-clair-720.webp" srcset="assets/photo-daou-noir-bois-clair-720.webp 720w, assets/photo-daou-noir-bois-clair.webp 1350w" sizes="76px" width="1350" height="1800" loading="lazy" decoding="async" alt="Ar-bol Daou, faïence noire et bois clair"><span><span class="nm">Daou</span><span class="ds"><span lang="fr">Faïence noire · bois clair</span><span lang="en">Black faience · light wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Daou">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Daou"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Daou">+</button></div></article>
+            <article class="var-card" data-variant-slug="tri"><div class="var-card-main"><img class="thumb" src="assets/photo-tri-blanc-bois-clair-720.webp" srcset="assets/photo-tri-blanc-bois-clair-720.webp 720w, assets/photo-tri-blanc-bois-clair.webp 1350w" sizes="76px" width="1350" height="1800" loading="lazy" decoding="async" alt="Ar-bol Tri, faïence blanche et bois clair"><span><span class="nm">Tri</span><span class="ds"><span lang="fr">Faïence blanche · bois clair</span><span lang="en">White faience · light wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Tri">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Tri"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Tri">+</button></div></article>
+            <article class="var-card" data-variant-slug="pevar"><div class="var-card-main"><img class="thumb" src="assets/photo-pevar-blanc-noir-720.webp" srcset="assets/photo-pevar-blanc-noir-720.webp 720w, assets/photo-pevar-blanc-noir.webp 1350w" sizes="76px" width="1350" height="1800" loading="lazy" decoding="async" alt="Ar-bol Pevar, faïence blanche et bois noir"><span><span class="nm">Pevar</span><span class="ds"><span lang="fr">Faïence blanche · bois noir</span><span lang="en">White faience · black wood</span></span></span></div><div class="quantity-control variant-quantity"><button type="button" data-quantity-decrease aria-label="Réduire la quantité de Pevar">−</button><input type="number" data-quantity value="0" min="0" max="20" step="1" inputmode="numeric" aria-label="Quantité de Pevar"><button type="button" data-quantity-increase aria-label="Augmenter la quantité de Pevar">+</button></div></article>
           </div>
           <p class="quantity-help" id="quantityHelp"><span lang="fr">Choisissez la quantité de chaque modèle — <b id="basketTotal">0</b> sur 20 exemplaires.</span><span lang="en">Choose a quantity for each model — <b id="basketTotalEn">0</b> of 20 pieces.</span></p>
           <div class="step-actions"><div class="spacer"></div><button type="button" class="btn btn-primary" data-next="2" disabled id="toStep2"><span lang="fr">Continuer</span><span lang="en">Continue</span></button></div>
@@ -352,7 +387,7 @@
         </div>
 
         <div class="step" data-step="3">
-          <h3><span lang="fr">Vos coordonnées & paiement</span><span lang="en">Your details & payment</span></h3>
+          <h3><span lang="fr">Vos coordonnées &amp; paiement</span><span lang="en">Your details &amp; payment</span></h3>
           <div class="field row">
             <div><label><span lang="fr">Prénom</span><span lang="en">First name</span></label><input type="text" id="fName" autocomplete="given-name"></div>
             <div><label><span lang="fr">Nom</span><span lang="en">Last name</span></label><input type="text" id="lName" autocomplete="family-name"></div>
@@ -384,22 +419,22 @@
       <div class="trust reveal">
         <div class="t">
           <span class="n">01</span>
-          <h4><span lang="fr">Paiement direct</span><span lang="en">Direct payment</span></h4>
+          <h3><span lang="fr">Paiement direct</span><span lang="en">Direct payment</span></h3>
           <p><span lang="fr">La commande est validée après paiement en ligne du montant total.</span><span lang="en">The order is confirmed after online payment of the full amount.</span></p>
         </div>
         <div class="t">
           <span class="n">02</span>
-          <h4><span lang="fr">Fabrication</span><span lang="en">Made to order</span></h4>
+          <h3><span lang="fr">Fabrication</span><span lang="en">Made to order</span></h3>
           <p><span lang="fr">Chaque pièce est façonnée à la commande, dans le Finistère.</span><span lang="en">Each piece is crafted to order, in Finistère.</span></p>
         </div>
         <div class="t">
           <span class="n">03</span>
-          <h4><span lang="fr">Livraison au choix</span><span lang="en">Your delivery choice</span></h4>
+          <h3><span lang="fr">Livraison au choix</span><span lang="en">Your delivery choice</span></h3>
           <p><span lang="fr">Les modes proposés et leurs tarifs sont affichés avant le paiement.</span><span lang="en">Available methods and prices are shown before payment.</span></p>
         </div>
         <div class="t">
           <span class="n">04</span>
-          <h4><span lang="fr">Coordonnées protégées</span><span lang="en">Protected details</span></h4>
+          <h3><span lang="fr">Coordonnées protégées</span><span lang="en">Protected details</span></h3>
           <p><span lang="fr">Aucune donnée bancaire n'est collectée sur ce formulaire.</span><span lang="en">No card details are collected through this form.</span></p>
         </div>
       </div>
@@ -442,7 +477,7 @@
   <span class="fc-label"><span lang="fr">Commander</span><span lang="en">Order</span></span>
 </a>
 
-<script src="image-slot.js?v=photos-ateliers"></script>
-<script src="arbol-v2.js?v=multi-quantity"></script>
+<script src="image-slot.js?v=responsive-images" defer></script>
+<script src="arbol-v2.js?v=seo-performance" defer></script>
 </body>
 </html>
