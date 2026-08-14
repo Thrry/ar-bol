@@ -556,6 +556,7 @@ img { display:block; max-width:100%; }
 }
 .fabrication-map {
   width: min(100%, 360px);
+  height: auto;
   justify-self: center;
   opacity: 0.68;
   mix-blend-mode: multiply;
