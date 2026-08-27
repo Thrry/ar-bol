@@ -577,6 +577,31 @@ img { display:block; max-width:100%; }
 .matter-copy .body-text { margin-top: 1.3rem; }
 .matter-care { margin-top: 1.8rem; border-top: 1px solid var(--line-l); padding-top: 1.1rem; font-size: 0.92rem; color: var(--ink-soft); }
 .matter-care b { color: var(--ink); font-weight: 500; }
+.matter-accreditation {
+  margin-top: 1.8rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line-l);
+}
+.matter-accreditation p {
+  margin: 0 0 0.9rem;
+  color: var(--ink-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.accreditation-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left center;
+  filter: grayscale(1);
+  transition: filter 280ms ease;
+}
+.matter-accreditation:hover .accreditation-logo { filter: grayscale(0); }
+.accreditation-logo-master { max-height: 118px; }
+.accreditation-logo-qualiopi { max-height: 110px; }
 .fabrication-close {
   max-width: 72ch;
   margin: clamp(3rem, 7vw, 5rem) auto 0;
@@ -656,6 +681,7 @@ img { display:block; max-width:100%; }
 
 @media (prefers-reduced-motion: reduce){
   html { scroll-behavior:auto; }
+  .accreditation-logo,
   .shipping-option,
   .shipping-option-mark::after { transition:none; }
   .shipping-option:active { transform:none; }
