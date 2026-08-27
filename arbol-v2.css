@@ -596,12 +596,16 @@ img { display:block; max-width:100%; }
   max-width: 100%;
   object-fit: contain;
   object-position: left center;
-  filter: grayscale(1);
-  transition: filter 280ms ease;
+  filter: grayscale(1) sepia(0.55) saturate(0.55) brightness(1.08);
+  opacity: 0.68;
+  transition: filter 280ms ease, opacity 280ms ease;
 }
-.matter-accreditation:hover .accreditation-logo { filter: grayscale(0); }
+.matter-accreditation:hover .accreditation-logo {
+  filter: none;
+  opacity: 1;
+}
 .accreditation-logo-master { max-height: 118px; }
-.accreditation-logo-qualiopi { max-height: 110px; }
+.accreditation-logo-qualiopi { max-height: 90px; }
 .fabrication-close {
   max-width: 72ch;
   margin: clamp(3rem, 7vw, 5rem) auto 0;
